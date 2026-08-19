@@ -11,6 +11,9 @@ const monacoEditorPlugin: MonacoEditorPluginFactory =
   monacoEditorPluginModule;
 
 export default defineConfig({
+  // GitHub Pages serves this as a project site at /edith/ — everything else
+  // (including this app's own dev server) stays at the root.
+  base: process.env.GITHUB_ACTIONS ? '/edith/' : '/',
   plugins: [
     react(),
     // Bundles the Monaco workers locally so the editor works fully offline
@@ -22,7 +25,7 @@ export default defineConfig({
         name: 'Edith',
         short_name: 'Edith',
         description: 'Edit static HTML pages with live code and preview, side by side.',
-        start_url: '/',
+        start_url: '.',
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#2563eb',
