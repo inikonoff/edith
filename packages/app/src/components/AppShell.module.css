@@ -1,0 +1,46 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--edith-border);
+}
+
+.brand {
+  font-weight: 600;
+}
+
+.topBarActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.codeColumn {
+  min-width: 0;
+}
+
+.previewColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.bottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.8rem;
+  border-top: 1px solid var(--edith-border);
+  font-size: 0.85rem;
+}

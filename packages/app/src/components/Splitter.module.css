@@ -1,0 +1,10 @@
+.splitter {
+  width: 5px;
+  cursor: col-resize;
+  background: var(--edith-border);
+  flex-shrink: 0;
+}
+
+.splitter:hover {
+  background: var(--edith-accent);
+}

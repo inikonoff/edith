@@ -1,0 +1,11 @@
+.pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.editor {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,22 @@
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--edith-border);
+  background: var(--edith-bg-alt);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-right: 1px solid var(--edith-border);
+  background: transparent;
+  color: var(--edith-fg-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tabActive {
+  background: var(--edith-bg);
+  color: var(--edith-fg);
+  font-weight: 600;
+}
