@@ -27,6 +27,14 @@ interface PreviewBuildResult {
   missingResources: string[];
 }
 
+export const MIN_ZOOM = 0.25;
+export const MAX_ZOOM = 2;
+const ZOOM_STEP = 0.1;
+
+function clampZoom(value: number): number {
+  return Math.round(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value)) * 100) / 100;
+}
+
 interface PreviewStore {
   srcDoc: string;
   /** Bumped on every build so the iframe is re-mounted (key={buildVersion}) instead of having
@@ -36,6 +44,8 @@ interface PreviewStore {
   entries: MapperEntry[];
   missingResources: string[];
   device: PreviewDevice;
+  /** transform: scale() factor on .frameWrap — visual only, never resizes the iframe's own viewport (spec §18/§26 device sizing stays separate from zoom). */
+  zoom: number;
   fullscreen: boolean;
   problems: ProblemItem[];
   selectedEntryId: string | null;
@@ -45,6 +55,10 @@ interface PreviewStore {
   manualUpdateRequestId: number;
   setBuildResult: (result: PreviewBuildResult) => void;
   setDevice: (device: PreviewDevice) => void;
+  setZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
   setFullscreen: (value: boolean) => void;
   addProblem: (problem: Omit<ProblemItem, 'id'>) => void;
   clearSelection: () => void;
@@ -65,6 +79,7 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
   entries: [],
   missingResources: [],
   device: 'desktop',
+  zoom: 1,
   fullscreen: false,
   problems: [],
   selectedEntryId: null,
@@ -86,6 +101,14 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
     })),
 
   setDevice: (device) => set({ device }),
+
+  setZoom: (zoom) => set({ zoom: clampZoom(zoom) }),
+
+  zoomIn: () => set((state) => ({ zoom: clampZoom(state.zoom + ZOOM_STEP) })),
+
+  zoomOut: () => set((state) => ({ zoom: clampZoom(state.zoom - ZOOM_STEP) })),
+
+  resetZoom: () => set({ zoom: 1 }),
 
   setFullscreen: (value) => set({ fullscreen: value }),
 

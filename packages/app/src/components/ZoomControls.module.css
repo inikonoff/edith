@@ -1,0 +1,26 @@
+.group {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.group button {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--edith-border);
+  background: var(--edith-bg);
+  color: var(--edith-fg-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.group button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.label {
+  min-width: 3.2rem;
+  text-align: center;
+}

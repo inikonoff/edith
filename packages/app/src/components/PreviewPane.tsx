@@ -9,6 +9,7 @@ import { DeviceSwitcher } from './DeviceSwitcher';
 import { ProblemsIndicator } from './ProblemsIndicator';
 import { RelatedCssPanel } from './RelatedCssPanel';
 import { SelectionOverlay } from './SelectionOverlay';
+import { ZoomControls } from './ZoomControls';
 import styles from './PreviewPane.module.css';
 
 const AUTO_UPDATE_DEBOUNCE_MS = 500;
@@ -28,6 +29,10 @@ export function PreviewPane() {
   const missingResources = usePreviewStore((state) => state.missingResources);
   const device = usePreviewStore((state) => state.device);
   const setDevice = usePreviewStore((state) => state.setDevice);
+  const zoom = usePreviewStore((state) => state.zoom);
+  const zoomIn = usePreviewStore((state) => state.zoomIn);
+  const zoomOut = usePreviewStore((state) => state.zoomOut);
+  const resetZoom = usePreviewStore((state) => state.resetZoom);
   const problems = usePreviewStore((state) => state.problems);
   const addProblem = usePreviewStore((state) => state.addProblem);
   const setBuildResult = usePreviewStore((state) => state.setBuildResult);
@@ -141,6 +146,7 @@ export function PreviewPane() {
     <div className={styles.pane}>
       <div className={styles.toolbar}>
         <DeviceSwitcher device={device} onChange={setDevice} />
+        <ZoomControls zoom={zoom} onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={resetZoom} />
         <ProblemsIndicator problems={problems} />
       </div>
 
@@ -171,20 +177,28 @@ export function PreviewPane() {
       )}
 
       <div className={styles.frameScroll}>
+        {/* Sized to the zoomed footprint so .frameScroll's scrollbars reflect
+            the actual visual size — the transform below scales .frameWrap's
+            painted output to match, without touching its layout box. */}
         <div
-          className={styles.frameWrap}
-          ref={wrapRef}
-          style={{ width: preset.width, height: preset.height }}
+          className={styles.zoomBox}
+          style={{ width: preset.width * zoom, height: preset.height * zoom }}
         >
-          <iframe
-            key={buildVersion}
-            ref={iframeRef}
-            className={styles.frame}
-            title="Preview"
-            sandbox="allow-scripts"
-            srcDoc={srcDoc}
-          />
-          <SelectionOverlay rect={selectedRect} iframeEl={iframeRef.current} wrapEl={wrapRef.current} />
+          <div
+            className={styles.frameWrap}
+            ref={wrapRef}
+            style={{ width: preset.width, height: preset.height, transform: `scale(${zoom})` }}
+          >
+            <iframe
+              key={buildVersion}
+              ref={iframeRef}
+              className={styles.frame}
+              title="Preview"
+              sandbox="allow-scripts"
+              srcDoc={srcDoc}
+            />
+            <SelectionOverlay rect={selectedRect} iframeEl={iframeRef.current} />
+          </div>
         </div>
       </div>
     </div>

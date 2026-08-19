@@ -46,11 +46,15 @@
   padding: 1rem;
 }
 
+.zoomBox {
+  flex-shrink: 0;
+}
+
 .frameWrap {
   position: relative;
-  flex-shrink: 0;
   background: #fff;
   box-shadow: 0 0 0 1px var(--edith-border);
+  transform-origin: top left;
 }
 
 .frame {
