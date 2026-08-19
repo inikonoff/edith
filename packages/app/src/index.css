@@ -1,11 +1,33 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --edith-bg: #ffffff;
   --edith-bg-alt: #f5f5f5;
   --edith-fg: #1a1a1a;
   --edith-fg-muted: #666666;
   --edith-border: #dddddd;
   --edith-accent: #2563eb;
+}
+
+/* Placeholder palette until Edith adopts LINK's actual brand tokens — kept
+   visually distinct from Light/Dark so the option is meaningfully different. */
+:root[data-theme='link'] {
+  color-scheme: light;
+  --edith-bg: #faf8f5;
+  --edith-bg-alt: #f0ece4;
+  --edith-fg: #2b2620;
+  --edith-fg-muted: #8a8275;
+  --edith-border: #e0d9cc;
+  --edith-accent: #a855f7;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --edith-bg: #1a1a1a;
+  --edith-bg-alt: #242424;
+  --edith-fg: #e5e5e5;
+  --edith-fg-muted: #999999;
+  --edith-border: #3a3a3a;
+  --edith-accent: #3b82f6;
 }
 
 * {

@@ -1,0 +1,8 @@
+.select {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 4px;
+  background: var(--edith-bg);
+  color: var(--edith-fg);
+}

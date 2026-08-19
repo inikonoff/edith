@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAutosave } from '../hooks/useAutosave';
+import { useHotkeys } from '../hooks/useHotkeys';
 import { saveCurrentPage } from '../page/saveActions';
 import { useEditorStore } from '../store/editorStore';
 import { usePreviewStore } from '../store/previewStore';
@@ -7,6 +8,7 @@ import { CodePane } from './CodePane';
 import { ExportMenu } from './ExportMenu';
 import { PreviewPane } from './PreviewPane';
 import { Splitter } from './Splitter';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { UnsavedChangesDialog } from './UnsavedChangesDialog';
 import styles from './AppShell.module.css';
 
@@ -57,6 +59,11 @@ export function AppShell() {
     setStatusMessage(outcome.message ?? (outcome.ok ? 'Saved.' : 'Save failed.'));
     window.setTimeout(() => setStatusMessage(null), 4000);
   }
+
+  useHotkeys({
+    onSave: handleSaveClick,
+    onUpdatePreview: requestManualUpdate,
+  });
 
   function handleBrandClick() {
     if (dirty) {
@@ -112,6 +119,7 @@ export function AppShell() {
           <button type="button" title="Fullscreen preview" onClick={() => setFullscreen(true)}>
             Preview ⛶
           </button>
+          <ThemeSwitcher />
         </div>
       </header>
 

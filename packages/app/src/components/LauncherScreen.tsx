@@ -9,6 +9,7 @@ import {
 import { importPage, loadPageForEditor, mimeTypeForPath, type DependencyFileInput } from '../page/pageService';
 import { useEditorStore } from '../store/editorStore';
 import { GitHubOpenPanel } from './GitHubOpenPanel';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import styles from './LauncherScreen.module.css';
 
 interface PendingImport {
@@ -131,6 +132,7 @@ export function LauncherScreen() {
     <div className={styles.screen}>
       <header className={styles.header}>
         <h1>Edith</h1>
+        <ThemeSwitcher />
       </header>
 
       {error && <div className={styles.error}>{error}</div>}
