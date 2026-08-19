@@ -1,0 +1,131 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 100;
+}
+
+.panel {
+  width: min(420px, 100%);
+  height: 100%;
+  background: var(--edith-bg);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.2);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.closeButton {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--edith-fg-muted);
+}
+
+.contextRow,
+.levelTabs {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.context,
+.contextActive,
+.tab,
+.tabActive {
+  border: 1px solid var(--edith-border);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  background: var(--edith-bg-alt);
+  color: var(--edith-fg);
+  cursor: pointer;
+}
+
+.contextActive,
+.tabActive {
+  background: var(--edith-accent, #3a6df0);
+  color: #fff;
+  border-color: transparent;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--edith-fg-muted);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--edith-fg-muted);
+}
+
+.field textarea,
+.field input {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: var(--edith-fg);
+  background: var(--edith-bg);
+  font-family: inherit;
+}
+
+.keysToggle {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: var(--edith-fg-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.keysForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 6px;
+  padding: 0.6rem;
+  background: var(--edith-bg-alt);
+}
+
+.error {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dc9a00;
+  background: #fff7e6;
+  color: #8a5a00;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.explanation {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAskEdithStore } from '../store/askEdithStore';
 import type { ProblemItem } from '../store/previewStore';
 import styles from './ProblemsIndicator.module.css';
 
@@ -8,6 +9,7 @@ interface ProblemsIndicatorProps {
 
 export function ProblemsIndicator({ problems }: ProblemsIndicatorProps) {
   const [open, setOpen] = useState(false);
+  const openAskEdith = useAskEdithStore((state) => state.openPanel);
   const errors = problems.filter((problem) => problem.kind === 'error');
   const warnings = problems.filter((problem) => problem.kind === 'warning');
 
@@ -24,6 +26,17 @@ export function ProblemsIndicator({ problems }: ProblemsIndicatorProps) {
           {problems.map((problem) => (
             <li key={problem.id} className={problem.kind === 'error' ? styles.error : styles.warning}>
               {problem.message}
+              {problem.kind === 'error' && (
+                <button
+                  type="button"
+                  className={styles.fixLink}
+                  onClick={() =>
+                    openAskEdith({ level: 'fix', contextMode: 'page', problemMessage: problem.message })
+                  }
+                >
+                  Fix with Ask Edith
+                </button>
+              )}
             </li>
           ))}
         </ul>

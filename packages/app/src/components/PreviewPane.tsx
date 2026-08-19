@@ -2,6 +2,7 @@ import { findEntryAtPosition, findEntryById, findMatchingCssRules } from '@edith
 import { useCallback, useEffect, useRef } from 'react';
 import { buildPreviewDocument } from '../preview/buildPreviewDocument';
 import { DEVICE_PRESETS } from '../preview/devicePresets';
+import { useAskEdithStore } from '../store/askEdithStore';
 import { getMainFilePath, useEditorStore } from '../store/editorStore';
 import { type Rect, usePreviewStore } from '../store/previewStore';
 import { DeviceSwitcher } from './DeviceSwitcher';
@@ -31,10 +32,12 @@ export function PreviewPane() {
   const addProblem = usePreviewStore((state) => state.addProblem);
   const setBuildResult = usePreviewStore((state) => state.setBuildResult);
   const selectedRect = usePreviewStore((state) => state.selectedRect);
+  const selectedEntryId = usePreviewStore((state) => state.selectedEntryId);
   const relatedCssRules = usePreviewStore((state) => state.relatedCssRules);
   const selectEntry = usePreviewStore((state) => state.selectEntry);
   const clearSelection = usePreviewStore((state) => state.clearSelection);
   const manualUpdateRequestId = usePreviewStore((state) => state.manualUpdateRequestId);
+  const openAskEdith = useAskEdithStore((state) => state.openPanel);
 
   const rebuild = useCallback(() => {
     const state = useEditorStore.getState();
@@ -82,12 +85,18 @@ export function PreviewPane() {
             .getState()
             .files.filter((file) => file.language === 'css')
             .map((file) => ({ path: file.path, content: file.content }));
+          const elementId = typeof data.elementId === 'string' ? data.elementId : undefined;
+          const classNames = Array.isArray(data.classNames) ? (data.classNames as string[]) : [];
           const related = findMatchingCssRules(cssFiles, {
             tagName: String(data.tagName),
-            id: typeof data.elementId === 'string' ? data.elementId : undefined,
-            classNames: Array.isArray(data.classNames) ? (data.classNames as string[]) : [],
+            id: elementId,
+            classNames,
           });
-          selectEntry(id, (data.rect as Rect) ?? null, related);
+          selectEntry(id, (data.rect as Rect) ?? null, related, {
+            tagName: String(data.tagName),
+            id: elementId,
+            classNames,
+          });
           break;
         }
         case 'edith:rect': {
@@ -150,6 +159,16 @@ export function PreviewPane() {
         rules={relatedCssRules}
         onJump={(file, line, column) => revealPosition({ path: file, line, column })}
       />
+
+      {selectedEntryId && (
+        <button
+          type="button"
+          className={styles.askEdithButton}
+          onClick={() => openAskEdith({ level: 'explain', contextMode: 'selection' })}
+        >
+          Ask Edith about this element
+        </button>
+      )}
 
       <div className={styles.frameScroll}>
         <div

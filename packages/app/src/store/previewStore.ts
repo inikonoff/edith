@@ -15,6 +15,12 @@ export interface ProblemItem {
   message: string;
 }
 
+export interface SelectedElementInfo {
+  tagName: string;
+  id?: string;
+  classNames: string[];
+}
+
 interface PreviewBuildResult {
   srcDoc: string;
   entries: MapperEntry[];
@@ -34,6 +40,7 @@ interface PreviewStore {
   problems: ProblemItem[];
   selectedEntryId: string | null;
   selectedRect: Rect | null;
+  selectedElementInfo: SelectedElementInfo | null;
   relatedCssRules: MatchedCssRule[];
   manualUpdateRequestId: number;
   setBuildResult: (result: PreviewBuildResult) => void;
@@ -41,7 +48,12 @@ interface PreviewStore {
   setFullscreen: (value: boolean) => void;
   addProblem: (problem: Omit<ProblemItem, 'id'>) => void;
   clearSelection: () => void;
-  selectEntry: (id: string, rect: Rect | null, relatedCssRules: MatchedCssRule[]) => void;
+  selectEntry: (
+    id: string,
+    rect: Rect | null,
+    relatedCssRules: MatchedCssRule[],
+    elementInfo?: SelectedElementInfo,
+  ) => void;
   requestManualUpdate: () => void;
 }
 
@@ -57,6 +69,7 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
   problems: [],
   selectedEntryId: null,
   selectedRect: null,
+  selectedElementInfo: null,
   relatedCssRules: [],
   manualUpdateRequestId: 0,
 
@@ -69,6 +82,7 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
       problems: [],
       selectedEntryId: null,
       selectedRect: null,
+      selectedElementInfo: null,
     })),
 
   setDevice: (device) => set({ device }),
@@ -78,10 +92,16 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
   addProblem: (problem) =>
     set((state) => ({ problems: [...state.problems, { ...problem, id: problemCounter++ }] })),
 
-  clearSelection: () => set({ selectedEntryId: null, selectedRect: null, relatedCssRules: [] }),
+  clearSelection: () =>
+    set({ selectedEntryId: null, selectedRect: null, relatedCssRules: [], selectedElementInfo: null }),
 
-  selectEntry: (id, rect, relatedCssRules) =>
-    set({ selectedEntryId: id, selectedRect: rect, relatedCssRules }),
+  selectEntry: (id, rect, relatedCssRules, elementInfo) =>
+    set((state) => ({
+      selectedEntryId: id,
+      selectedRect: rect,
+      relatedCssRules,
+      selectedElementInfo: elementInfo ?? state.selectedElementInfo,
+    })),
 
   requestManualUpdate: () => set((state) => ({ manualUpdateRequestId: state.manualUpdateRequestId + 1 })),
 }));

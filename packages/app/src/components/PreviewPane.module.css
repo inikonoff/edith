@@ -28,6 +28,18 @@
   padding-left: 1.1rem;
 }
 
+.askEdithButton {
+  align-self: flex-start;
+  margin: 0.4rem 0.6rem 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 6px;
+  background: var(--edith-bg);
+  color: var(--edith-fg);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .frameScroll {
   flex: 1;
   overflow: auto;

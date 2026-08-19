@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useAutosave } from '../hooks/useAutosave';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { saveCurrentPage } from '../page/saveActions';
+import { useAskEdithStore } from '../store/askEdithStore';
 import { useEditorStore } from '../store/editorStore';
 import { usePreviewStore } from '../store/previewStore';
+import { AskEdithPanel } from './AskEdithPanel';
 import { CodePane } from './CodePane';
 import { ExportMenu } from './ExportMenu';
 import { PreviewPane } from './PreviewPane';
@@ -24,6 +26,7 @@ export function AppShell() {
   const requestManualUpdate = usePreviewStore((state) => state.requestManualUpdate);
   const pageTitle = useEditorStore((state) => state.pageTitle);
   const showLauncher = useEditorStore((state) => state.showLauncher);
+  const openAskEdith = useAskEdithStore((state) => state.openPanel);
   const mainRef = useRef<HTMLDivElement>(null);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -89,6 +92,7 @@ export function AppShell() {
     return (
       <div className={styles.fullscreenShell}>
         <PreviewPane />
+        <AskEdithPanel />
       </div>
     );
   }
@@ -116,6 +120,13 @@ export function AppShell() {
             Save
           </button>
           <ExportMenu />
+          <button
+            type="button"
+            title="Ask Edith about the whole page"
+            onClick={() => openAskEdith({ level: 'create', contextMode: 'page' })}
+          >
+            Ask Edith
+          </button>
           <button type="button" title="Fullscreen preview" onClick={() => setFullscreen(true)}>
             Preview ⛶
           </button>
@@ -146,6 +157,8 @@ export function AppShell() {
           Update preview
         </button>
       </footer>
+
+      <AskEdithPanel />
     </div>
   );
 }

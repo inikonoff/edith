@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@edith/ai": "workspace:*",
     "@edith/core": "workspace:*",
     "@edith/git": "workspace:*",
     "@edith/mapper": "workspace:*",

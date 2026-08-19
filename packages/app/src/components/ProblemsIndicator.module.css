@@ -40,3 +40,15 @@
   color: #8a5a00;
   padding: 0.15rem 0;
 }
+
+.fixLink {
+  display: block;
+  margin-top: 0.1rem;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
