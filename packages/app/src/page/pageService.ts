@@ -3,13 +3,17 @@ import {
   FileTooLargeError,
   getPage,
   listPageFiles,
+  mimeTypeForPath,
   putPage,
   putPageFile,
   type FileKind,
+  type GitSourceInfo,
   type PageRecord,
 } from '@edith/core';
 import { languageForPath } from '../editor/language';
 import type { EditorFile } from '../store/editorStore';
+
+export { mimeTypeForPath };
 
 export interface DependencyFileInput {
   path: string;
@@ -38,32 +42,6 @@ function fileNameOf(path: string): string {
   return path.includes('/') ? (path.split('/').pop() ?? path) : path;
 }
 
-const MIME_BY_EXTENSION: Record<string, string> = {
-  html: 'text/html',
-  htm: 'text/html',
-  css: 'text/css',
-  js: 'text/javascript',
-  mjs: 'text/javascript',
-  json: 'application/json',
-  svg: 'image/svg+xml',
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  webp: 'image/webp',
-  gif: 'image/gif',
-  ico: 'image/x-icon',
-  woff: 'font/woff',
-  woff2: 'font/woff2',
-  ttf: 'font/ttf',
-  otf: 'font/otf',
-};
-
-/** Fallback for when the picked File's own `.type` is empty (browsers don't guess every extension). */
-export function mimeTypeForPath(path: string): string {
-  const ext = path.split('.').pop()?.toLowerCase() ?? '';
-  return MIME_BY_EXTENSION[ext] ?? 'application/octet-stream';
-}
-
 async function byteSizeOf(content: string | Blob): Promise<number> {
   return typeof content === 'string' ? new TextEncoder().encode(content).length : content.size;
 }
@@ -73,12 +51,14 @@ async function byteSizeOf(content: string | Blob): Promise<number> {
  * Project (spec §5-9). Dedupes by content-hash of the main file — reopening
  * the same page updates its metadata instead of creating a duplicate.
  * A file that fails to store (e.g. exceeds the size limit) is reported back
- * rather than aborting the whole import (spec §7).
+ * rather than aborting the whole import (spec §7). Pass `git` to import a
+ * file opened from a GitHub repo instead of local disk (spec §28-31).
  */
 export async function importPage(
   mainPath: string,
   mainContent: string,
   dependencies: DependencyFileInput[],
+  git?: GitSourceInfo,
 ): Promise<ImportResult> {
   const id = await computeContentHash(mainContent);
   const now = Date.now();
@@ -92,7 +72,8 @@ export async function importPage(
     updatedAt: now,
     lastOpenedAt: now,
     dirty: false,
-    source: 'local',
+    source: git ? 'git' : 'local',
+    ...(git ? { git } : {}),
   };
   await putPage(page);
 

@@ -20,6 +20,8 @@ export interface GitSourceInfo {
   repo: string;
   branch: string;
   path: string;
+  /** Commit the page currently reflects — set after a successful open or Git Save (spec §31). */
+  lastSyncedCommitSha?: string;
 }
 
 export interface PageRecord {

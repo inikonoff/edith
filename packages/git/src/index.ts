@@ -1,2 +1,3 @@
-// GitHub integration: PAT auth, Git Data API (blobs → tree → commit → ref).
-export {};
+export * from './auth';
+export * from './githubApi';
+export * from './repoService';

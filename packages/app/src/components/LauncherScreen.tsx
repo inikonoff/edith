@@ -8,6 +8,7 @@ import {
 } from '../page/openLocalFile';
 import { importPage, loadPageForEditor, mimeTypeForPath, type DependencyFileInput } from '../page/pageService';
 import { useEditorStore } from '../store/editorStore';
+import { GitHubOpenPanel } from './GitHubOpenPanel';
 import styles from './LauncherScreen.module.css';
 
 interface PendingImport {
@@ -188,6 +189,7 @@ export function LauncherScreen() {
         <button type="button" className={styles.openCard} onClick={handleOpenFile} disabled={busy}>
           + Open file
         </button>
+        <GitHubOpenPanel onImported={refresh} />
       </div>
     </div>
   );
