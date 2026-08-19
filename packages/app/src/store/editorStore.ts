@@ -1,3 +1,4 @@
+import { putPageState } from '@edith/core';
 import { create } from 'zustand';
 
 export interface EditorFile {
@@ -19,7 +20,17 @@ export interface CursorState {
   column: number;
 }
 
+export type AppView = 'launcher' | 'editor';
+
+interface LoadedPageInput {
+  page: { id: string; title: string };
+  editorFiles: EditorFile[];
+}
+
 interface EditorStore {
+  view: AppView;
+  pageId: string | null;
+  pageTitle: string;
   files: EditorFile[];
   activeFile: string;
   dirty: boolean;
@@ -29,6 +40,8 @@ interface EditorStore {
   pendingReveal: RevealTarget | null;
   /** Latest editor cursor position, feeding the Code→Preview highlight (spec §21). */
   cursor: CursorState | null;
+  loadPage: (loaded: LoadedPageInput) => void;
+  showLauncher: () => void;
   setActiveFile: (path: string) => void;
   updateFileContent: (path: string, content: string) => void;
   setAutoUpdate: (value: boolean) => void;
@@ -39,7 +52,10 @@ interface EditorStore {
   setCursor: (cursor: CursorState) => void;
 }
 
-export const useEditorStore = create<EditorStore>((set) => ({
+export const useEditorStore = create<EditorStore>((set, get) => ({
+  view: 'launcher',
+  pageId: null,
+  pageTitle: '',
   files: [],
   activeFile: '',
   dirty: false,
@@ -48,7 +64,31 @@ export const useEditorStore = create<EditorStore>((set) => ({
   pendingReveal: null,
   cursor: null,
 
-  setActiveFile: (path) => set({ activeFile: path }),
+  loadPage: ({ page, editorFiles }) =>
+    set({
+      view: 'editor',
+      pageId: page.id,
+      pageTitle: page.title,
+      files: editorFiles,
+      activeFile: editorFiles.find((file) => file.isMain)?.path ?? editorFiles[0]?.path ?? '',
+      dirty: false,
+      pendingReveal: null,
+      cursor: null,
+    }),
+
+  showLauncher: () => set({ view: 'launcher' }),
+
+  setActiveFile: (path) => {
+    set({ activeFile: path });
+    // Minimal Editor Session restore target (spec §8): remember the active
+    // file so relaunching the app can return to it.
+    const pageId = get().pageId;
+    if (pageId) {
+      putPageState({ pageId, activeFile: path }).catch(() => {
+        // Best-effort — losing the session-restore hint isn't user-facing.
+      });
+    }
+  },
 
   updateFileContent: (path, content) =>
     set((state) => ({

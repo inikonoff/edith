@@ -1,0 +1,122 @@
+.screen {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  margin: 0 0 1.5rem;
+}
+
+.error {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #dc9a00;
+  background: #fff7e6;
+  color: #8a5a00;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.dependencyPrompt {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 6px;
+  background: var(--edith-bg-alt);
+}
+
+.dependencyPrompt ul {
+  margin: 0.3rem 0;
+  padding-left: 1.2rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.dependencyActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  color: var(--edith-fg-muted);
+  margin: 0 0 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  position: relative;
+  border: 1px solid var(--edith-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  background: var(--edith-bg);
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardBody:hover {
+  background: var(--edith-bg-alt);
+}
+
+.mainFile {
+  font-size: 0.8rem;
+  color: var(--edith-fg-muted);
+}
+
+.date {
+  font-size: 0.75rem;
+  color: var(--edith-fg-muted);
+}
+
+.deleteButton {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: var(--edith-bg-alt);
+  color: var(--edith-fg-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.confirmDelete {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  background: #fff0f0;
+}
+
+.openCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  border: 1px dashed var(--edith-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--edith-fg-muted);
+  cursor: pointer;
+}

@@ -15,6 +15,8 @@ export function AppShell() {
   const fullscreen = usePreviewStore((state) => state.fullscreen);
   const setFullscreen = usePreviewStore((state) => state.setFullscreen);
   const requestManualUpdate = usePreviewStore((state) => state.requestManualUpdate);
+  const pageTitle = useEditorStore((state) => state.pageTitle);
+  const showLauncher = useEditorStore((state) => state.showLauncher);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Esc exits fullscreen Preview (spec §26, §40).
@@ -38,7 +40,12 @@ export function AppShell() {
   return (
     <div className={styles.shell}>
       <header className={styles.topBar}>
-        <span className={styles.brand}>Edith</span>
+        <div className={styles.topBarLeft}>
+          <button type="button" className={styles.brandButton} onClick={showLauncher} title="My Pages">
+            Edith
+          </button>
+          {pageTitle && <span className={styles.pageTitle}>{pageTitle}</span>}
+        </div>
         <div className={styles.topBarActions}>
           <button type="button" disabled={!dirty}>
             Save
