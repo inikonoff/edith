@@ -19,6 +19,28 @@ interface PendingImport {
   fileHandle: FileSystemFileHandle | null;
 }
 
+const BLANK_PAGE_TEMPLATE = `<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Blank Page</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blank page</h1>
+</body>
+</html>
+`;
+
 export function LauncherScreen() {
   const loadPage = useEditorStore((state) => state.loadPage);
   const [pages, setPages] = useState<PageRecord[]>([]);
@@ -58,6 +80,11 @@ export function LauncherScreen() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function handleCreateBlankPage() {
+    setError(null);
+    await finalizeImport('index.html', BLANK_PAGE_TEMPLATE, [], null);
   }
 
   async function handleOpenFile() {
@@ -158,6 +185,10 @@ export function LauncherScreen() {
 
       <h2 className={styles.sectionTitle}>My Pages</h2>
       <div className={styles.grid}>
+        <button type="button" className={styles.openCard} onClick={handleCreateBlankPage} disabled={busy}>
+          + Blank Page
+        </button>
+
         {pages.map((page) => (
           <div key={page.id} className={styles.card}>
             <button type="button" className={styles.cardBody} onClick={() => handleOpenPage(page.id)}>
