@@ -1,0 +1,7 @@
+.overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid var(--edith-accent);
+  background: rgba(37, 99, 235, 0.08);
+  z-index: 5;
+}

@@ -1,0 +1,42 @@
+.wrap {
+  position: relative;
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  border: 1px solid #dc9a00;
+  background: #fff7e6;
+  color: #8a5a00;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.details {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+  margin: 0.25rem 0 0;
+  padding: 0.5rem;
+  min-width: 260px;
+  max-width: 420px;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--edith-bg);
+  border: 1px solid var(--edith-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  font-size: 0.8rem;
+}
+
+.error {
+  color: #b00020;
+  padding: 0.15rem 0;
+}
+
+.warning {
+  color: #8a5a00;
+  padding: 0.15rem 0;
+}

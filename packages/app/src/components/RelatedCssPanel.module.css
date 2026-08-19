@@ -1,0 +1,26 @@
+.panel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  padding: 0.3rem 0.6rem;
+  border-bottom: 1px solid var(--edith-border);
+  font-size: 0.78rem;
+  background: var(--edith-bg-alt);
+}
+
+.label {
+  color: var(--edith-fg-muted);
+}
+
+.chip {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--edith-border);
+  border-radius: 999px;
+  background: var(--edith-bg);
+  cursor: pointer;
+}
+
+.location {
+  color: var(--edith-fg-muted);
+}

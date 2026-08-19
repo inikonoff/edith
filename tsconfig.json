@@ -1,9 +1,5 @@
 {
   "files": [],
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/mapper" },
-    { "path": "./packages/git" },
-    { "path": "./packages/app" }
-  ]
+  "include": [],
+  "exclude": ["node_modules"]
 }

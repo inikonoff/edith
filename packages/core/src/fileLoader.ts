@@ -31,14 +31,16 @@ export function resolveRelativePath(url: string, baseDir: string): string {
   return decodeURIComponent(resolved.pathname.replace(/^\//, ''));
 }
 
+export function dirname(path: string): string {
+  return path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
+}
+
 /**
  * Finds local (non-external) resources referenced by an HTML document:
  * stylesheets, scripts, images, and media (spec §12).
  */
 export function findLocalDependencies(html: string, entryFilePath: string): string[] {
-  const baseDir = entryFilePath.includes('/')
-    ? entryFilePath.slice(0, entryFilePath.lastIndexOf('/'))
-    : '';
+  const baseDir = dirname(entryFilePath);
   const document = parse(html) as unknown as Parse5Element;
   const found = new Set<string>();
 
