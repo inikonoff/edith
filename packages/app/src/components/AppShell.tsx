@@ -1,9 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useAutosave } from '../hooks/useAutosave';
+import { saveCurrentPage } from '../page/saveActions';
 import { useEditorStore } from '../store/editorStore';
 import { usePreviewStore } from '../store/previewStore';
 import { CodePane } from './CodePane';
+import { ExportMenu } from './ExportMenu';
 import { PreviewPane } from './PreviewPane';
 import { Splitter } from './Splitter';
+import { UnsavedChangesDialog } from './UnsavedChangesDialog';
 import styles from './AppShell.module.css';
 
 export function AppShell() {
@@ -12,12 +16,18 @@ export function AppShell() {
   const autoUpdate = useEditorStore((state) => state.autoUpdate);
   const setAutoUpdate = useEditorStore((state) => state.setAutoUpdate);
   const dirty = useEditorStore((state) => state.dirty);
+  const markSaved = useEditorStore((state) => state.markSaved);
   const fullscreen = usePreviewStore((state) => state.fullscreen);
   const setFullscreen = usePreviewStore((state) => state.setFullscreen);
   const requestManualUpdate = usePreviewStore((state) => state.requestManualUpdate);
   const pageTitle = useEditorStore((state) => state.pageTitle);
   const showLauncher = useEditorStore((state) => state.showLauncher);
   const mainRef = useRef<HTMLDivElement>(null);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useAutosave();
 
   // Esc exits fullscreen Preview (spec §26, §40).
   useEffect(() => {
@@ -29,6 +39,45 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [fullscreen, setFullscreen]);
 
+  // Native "leave site?" prompt on tab close/reload with unsaved changes.
+  useEffect(() => {
+    function onBeforeUnload(event: BeforeUnloadEvent) {
+      if (!dirty) return;
+      event.preventDefault();
+      event.returnValue = '';
+    }
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
+
+  async function handleSaveClick() {
+    setSaving(true);
+    const outcome = await saveCurrentPage();
+    setSaving(false);
+    setStatusMessage(outcome.message ?? (outcome.ok ? 'Saved.' : 'Save failed.'));
+    window.setTimeout(() => setStatusMessage(null), 4000);
+  }
+
+  function handleBrandClick() {
+    if (dirty) {
+      setShowUnsavedDialog(true);
+    } else {
+      showLauncher();
+    }
+  }
+
+  async function handleDialogSave() {
+    await saveCurrentPage();
+    setShowUnsavedDialog(false);
+    showLauncher();
+  }
+
+  function handleDialogDiscard() {
+    markSaved();
+    setShowUnsavedDialog(false);
+    showLauncher();
+  }
+
   if (fullscreen) {
     return (
       <div className={styles.fullscreenShell}>
@@ -39,17 +88,27 @@ export function AppShell() {
 
   return (
     <div className={styles.shell}>
+      {showUnsavedDialog && (
+        <UnsavedChangesDialog
+          onSave={handleDialogSave}
+          onDiscard={handleDialogDiscard}
+          onCancel={() => setShowUnsavedDialog(false)}
+        />
+      )}
+
       <header className={styles.topBar}>
         <div className={styles.topBarLeft}>
-          <button type="button" className={styles.brandButton} onClick={showLauncher} title="My Pages">
+          <button type="button" className={styles.brandButton} onClick={handleBrandClick} title="My Pages">
             Edith
           </button>
           {pageTitle && <span className={styles.pageTitle}>{pageTitle}</span>}
+          {statusMessage && <span className={styles.statusMessage}>{statusMessage}</span>}
         </div>
         <div className={styles.topBarActions}>
-          <button type="button" disabled={!dirty}>
+          <button type="button" disabled={!dirty || saving} onClick={handleSaveClick}>
             Save
           </button>
+          <ExportMenu />
           <button type="button" title="Fullscreen preview" onClick={() => setFullscreen(true)}>
             Preview ⛶
           </button>

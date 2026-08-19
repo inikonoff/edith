@@ -25,6 +25,8 @@ export type AppView = 'launcher' | 'editor';
 interface LoadedPageInput {
   page: { id: string; title: string };
   editorFiles: EditorFile[];
+  /** Live handle to the file opened via the File System Access API, if any — enables direct-to-disk Save (spec §11, §27). */
+  fileHandle?: FileSystemFileHandle | null;
 }
 
 interface EditorStore {
@@ -36,6 +38,7 @@ interface EditorStore {
   dirty: boolean;
   autoUpdate: boolean;
   splitPosition: number;
+  fileHandle: FileSystemFileHandle | null;
   /** Set by a Preview→Code jump; CodePane switches tabs and reveals it, then clears it (spec §20.1). */
   pendingReveal: RevealTarget | null;
   /** Latest editor cursor position, feeding the Code→Preview highlight (spec §21). */
@@ -61,10 +64,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   dirty: false,
   autoUpdate: true,
   splitPosition: 0.5,
+  fileHandle: null,
   pendingReveal: null,
   cursor: null,
 
-  loadPage: ({ page, editorFiles }) =>
+  loadPage: ({ page, editorFiles, fileHandle }) =>
     set({
       view: 'editor',
       pageId: page.id,
@@ -72,6 +76,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       files: editorFiles,
       activeFile: editorFiles.find((file) => file.isMain)?.path ?? editorFiles[0]?.path ?? '',
       dirty: false,
+      fileHandle: fileHandle ?? null,
       pendingReveal: null,
       cursor: null,
     }),

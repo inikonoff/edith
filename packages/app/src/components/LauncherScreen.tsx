@@ -14,6 +14,7 @@ interface PendingImport {
   mainPath: string;
   mainContent: string;
   dependencies: string[];
+  fileHandle: FileSystemFileHandle | null;
 }
 
 export function LauncherScreen() {
@@ -34,7 +35,12 @@ export function LauncherScreen() {
     refresh();
   }, [refresh]);
 
-  async function finalizeImport(mainPath: string, mainContent: string, dependencies: DependencyFileInput[]) {
+  async function finalizeImport(
+    mainPath: string,
+    mainContent: string,
+    dependencies: DependencyFileInput[],
+    fileHandle: FileSystemFileHandle | null,
+  ) {
     setBusy(true);
     setError(null);
     try {
@@ -43,7 +49,7 @@ export function LauncherScreen() {
         setError(`Skipped (too large): ${failedFiles.map((f) => f.path).join(', ')}`);
       }
       const loaded = await loadPageForEditor(page.id);
-      if (loaded) loadPage(loaded);
+      if (loaded) loadPage({ ...loaded, fileHandle });
       setPendingImport(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -65,9 +71,14 @@ export function LauncherScreen() {
 
     const dependencies = findLocalDependencies(picked.content, picked.name);
     if (dependencies.length === 0) {
-      await finalizeImport(picked.name, picked.content, []);
+      await finalizeImport(picked.name, picked.content, [], picked.fileHandle);
     } else {
-      setPendingImport({ mainPath: picked.name, mainContent: picked.content, dependencies });
+      setPendingImport({
+        mainPath: picked.name,
+        mainContent: picked.content,
+        dependencies,
+        fileHandle: picked.fileHandle,
+      });
     }
   }
 
@@ -87,7 +98,12 @@ export function LauncherScreen() {
           content: kind === 'text' ? await file.text() : file,
         });
       }
-      await finalizeImport(pendingImport.mainPath, pendingImport.mainContent, dependencyInputs);
+      await finalizeImport(
+        pendingImport.mainPath,
+        pendingImport.mainContent,
+        dependencyInputs,
+        pendingImport.fileHandle,
+      );
     } finally {
       setBusy(false);
     }
@@ -95,12 +111,13 @@ export function LauncherScreen() {
 
   async function handleSkipDependencies() {
     if (!pendingImport) return;
-    await finalizeImport(pendingImport.mainPath, pendingImport.mainContent, []);
+    await finalizeImport(pendingImport.mainPath, pendingImport.mainContent, [], pendingImport.fileHandle);
   }
 
   async function handleOpenPage(pageId: string) {
+    // Reopened from My Pages, not a live picker — no disk handle to write back to.
     const loaded = await loadPageForEditor(pageId);
-    if (loaded) loadPage(loaded);
+    if (loaded) loadPage({ ...loaded, fileHandle: null });
   }
 
   async function handleDelete(pageId: string) {

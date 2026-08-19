@@ -162,3 +162,32 @@ export async function loadPageForEditor(pageId: string): Promise<LoadedPage | un
 
   return { page, editorFiles, binaryFileCount };
 }
+
+/**
+ * Writes the editor's current text files back into the Page Project's
+ * IndexedDB storage (Local Save, spec §27) and refreshes the page's title
+ * from the (possibly just-edited) <title> tag. Binary files are untouched —
+ * nothing in the editor can currently modify them.
+ */
+export async function savePageContent(pageId: string, files: EditorFile[]): Promise<void> {
+  const page = await getPage(pageId);
+  if (!page) throw new Error(`Page "${pageId}" no longer exists`);
+
+  const now = Date.now();
+  for (const file of files) {
+    await putPageFile({
+      pageId,
+      path: file.path,
+      kind: 'text',
+      mimeType: mimeTypeForPath(file.path),
+      size: await byteSizeOf(file.content),
+      isMain: file.isMain,
+      lastModified: now,
+      content: file.content,
+    });
+  }
+
+  const mainFile = files.find((file) => file.isMain);
+  const title = (mainFile && titleFromHtml(mainFile.content)) ?? page.title;
+  await putPage({ ...page, title, updatedAt: now, dirty: false });
+}

@@ -27,6 +27,8 @@ function pickFilesFallback(accept: string, multiple: boolean): Promise<File[]> {
 export interface PickedHtmlFile {
   name: string;
   content: string;
+  /** Present only via the File System Access API — lets Save write straight back to this file (spec §11, §27). */
+  fileHandle: FileSystemFileHandle | null;
 }
 
 export async function pickHtmlFile(): Promise<PickedHtmlFile | undefined> {
@@ -40,13 +42,14 @@ export async function pickHtmlFile(): Promise<PickedHtmlFile | undefined> {
       if (isAbortError(error)) return undefined;
       throw error;
     }
-    const file = await handles[0]!.getFile();
-    return { name: file.name, content: await file.text() };
+    const handle = handles[0]!;
+    const file = await handle.getFile();
+    return { name: file.name, content: await file.text(), fileHandle: handle };
   }
 
   const [file] = await pickFilesFallback('.html,.htm,text/html', false);
   if (!file) return undefined;
-  return { name: file.name, content: await file.text() };
+  return { name: file.name, content: await file.text(), fileHandle: null };
 }
 
 export async function pickDependencyFiles(): Promise<File[]> {

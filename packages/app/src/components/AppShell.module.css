@@ -33,6 +33,11 @@
   font-size: 0.85rem;
 }
 
+.statusMessage {
+  color: var(--edith-fg-muted);
+  font-size: 0.8rem;
+}
+
 .topBarActions {
   display: flex;
   gap: 0.5rem;

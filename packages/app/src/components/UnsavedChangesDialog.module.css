@@ -1,0 +1,27 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog {
+  background: var(--edith-bg);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  min-width: 280px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.dialog p {
+  margin: 0 0 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
