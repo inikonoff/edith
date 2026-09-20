@@ -72,12 +72,23 @@ function pickPreferredHtml(paths: string[]): string | undefined {
   );
 }
 
+// Skips directories/files a user almost never means to import when they pick
+// or drop a whole project folder — without this, "Open folder" on a real web
+// project walks node_modules in its entirety (tens of thousands of files).
+const EXCLUDED_ENTRY_NAMES = new Set(['node_modules', '.git']);
+const MAX_FOLDER_FILES = 500;
+
+function shouldSkipEntryName(name: string): boolean {
+  return name.startsWith('.') || EXCLUDED_ENTRY_NAMES.has(name);
+}
+
 async function collectDirectoryFiles(
   handle: FileSystemDirectoryHandle,
   prefix = '',
 ): Promise<PickedProjectFile[]> {
   const collected: PickedProjectFile[] = [];
   for await (const [name, child] of handle.entries()) {
+    if (shouldSkipEntryName(name)) continue;
     if (child.kind === 'directory') {
       collected.push(...(await collectDirectoryFiles(child, `${prefix}${name}/`)));
     } else {
@@ -102,15 +113,32 @@ export async function pickHtmlFolder(): Promise<PickedFolderProject | undefined>
       throw error;
     }
     const files = await collectDirectoryFiles(root);
-    return folderProjectFromFiles(files);
+    const project = folderProjectFromFiles(files);
+    if (!project) throw new Error('No HTML file found in this folder.');
+    return project;
   }
 
   const files = await pickFilesFallback('*/*', true);
   if (files.length === 0) return undefined;
-  return folderProjectFromFiles(files.map((file) => ({ path: file.name, file })));
+  const project = folderProjectFromFiles(files.map((file) => ({ path: file.name, file })));
+  if (!project) throw new Error('No HTML file found in this folder.');
+  return project;
 }
 
-export function folderProjectFromFiles(files: PickedProjectFile[]): PickedFolderProject | undefined {
+/**
+ * `undefined` means no HTML file was found — a normal, expected outcome for a
+ * plain drag-and-drop (the caller decides how to report it). A folder over
+ * the file-count cap throws instead, since silently importing it would hang
+ * the tab rather than just "not find" anything.
+ */
+export function folderProjectFromFiles(
+  files: PickedProjectFile[],
+): PickedFolderProject | undefined {
+  if (files.length > MAX_FOLDER_FILES) {
+    throw new Error(
+      `This folder has ${files.length} files (limit ${MAX_FOLDER_FILES}) — pick a smaller project folder.`,
+    );
+  }
   const mainPath = pickPreferredHtml(files.map((entry) => entry.path));
   if (!mainPath) return undefined;
   const main = files.find((entry) => entry.path === mainPath);
@@ -118,7 +146,9 @@ export function folderProjectFromFiles(files: PickedProjectFile[]): PickedFolder
   return { mainPath, mainContent: '', files };
 }
 
-export async function readFolderProject(project: PickedFolderProject): Promise<PickedFolderProject> {
+export async function readFolderProject(
+  project: PickedFolderProject,
+): Promise<PickedFolderProject> {
   const main = project.files.find((entry) => entry.path === project.mainPath);
   if (!main) return project;
   return { ...project, mainContent: await main.file.text() };
@@ -130,11 +160,18 @@ interface FileSystemEntryLike {
   name: string;
   file?: (ok: (file: File) => void, err: (error: Error) => void) => void;
   createReader?: () => {
-    readEntries: (ok: (entries: FileSystemEntryLike[]) => void, err: (error: Error) => void) => void;
+    readEntries: (
+      ok: (entries: FileSystemEntryLike[]) => void,
+      err: (error: Error) => void,
+    ) => void;
   };
 }
 
-async function readDroppedEntry(entry: FileSystemEntryLike, prefix = ''): Promise<PickedProjectFile[]> {
+async function readDroppedEntry(
+  entry: FileSystemEntryLike,
+  prefix = '',
+): Promise<PickedProjectFile[]> {
+  if (shouldSkipEntryName(entry.name)) return [];
   if (entry.isFile) {
     const file = await new Promise<File>((resolve, reject) => {
       entry.file!(resolve, reject);

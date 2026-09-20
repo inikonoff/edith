@@ -32,6 +32,19 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
     send({ type: 'edith:rect', id: trackedId, rect: el ? visibleRectOf(el) : null });
   }
 
+  // Native scroll events can fire far faster than once per frame — coalesce
+  // bursts (inertial scrolling, resize drags) into at most one report per
+  // animation frame instead of a postMessage + parent re-render on every tick.
+  var reportScheduled = false;
+  function scheduleReportTracked() {
+    if (reportScheduled) return;
+    reportScheduled = true;
+    requestAnimationFrame(function () {
+      reportScheduled = false;
+      reportTracked();
+    });
+  }
+
   document.addEventListener(
     'click',
     function (event) {
@@ -74,8 +87,8 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
     send({ type: 'edith:error', message: 'Unhandled promise rejection: ' + String(event.reason) });
   });
 
-  window.addEventListener('scroll', function () { reportTracked(); }, true);
-  window.addEventListener('resize', function () { reportTracked(); });
+  window.addEventListener('scroll', function () { scheduleReportTracked(); }, true);
+  window.addEventListener('resize', function () { scheduleReportTracked(); });
 
   window.addEventListener('message', function (event) {
     var data = event.data;

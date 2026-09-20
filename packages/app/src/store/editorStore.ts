@@ -76,6 +76,7 @@ interface EditorStore {
   setSplitAxis: (axis: SplitAxis) => void;
   swapPanes: () => void;
   setSplitSwapped: (value: boolean) => void;
+  restoreSplitFromSession: (session: { splitPosition?: number; splitAxis?: SplitAxis; splitSwapped?: boolean }) => void;
   setSaveStatus: (status: EditorStore['saveStatus']) => void;
   markSaved: () => void;
   revealPosition: (target: RevealTarget) => void;
@@ -155,6 +156,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   setSplitSwapped: (value) => {
     set({ splitSwapped: value });
+    persistSplit(get());
+  },
+
+  // Boot-time session restore (spec §8): one write instead of one per field,
+  // since App.tsx used to call setSplitPosition/setSplitAxis/setSplitSwapped
+  // in sequence, each independently persisting the same final state.
+  restoreSplitFromSession: (session) => {
+    set({
+      ...(session.splitPosition !== undefined ? { splitPosition: session.splitPosition } : {}),
+      ...(session.splitAxis !== undefined ? { splitAxis: session.splitAxis } : {}),
+      ...(session.splitSwapped !== undefined ? { splitSwapped: session.splitSwapped } : {}),
+    });
     persistSplit(get());
   },
 

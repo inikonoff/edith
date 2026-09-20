@@ -19,17 +19,3 @@
 .splitterHorizontal:hover {
   background: var(--edith-accent);
 }
-
-.dragging,
-.dragging * {
-  cursor: inherit;
-  user-select: none !important;
-}
-
-body.dragging {
-  cursor: col-resize;
-}
-
-body.dragging:has([aria-orientation='horizontal']) {
-  cursor: row-resize;
-}

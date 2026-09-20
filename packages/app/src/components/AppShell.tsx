@@ -92,7 +92,13 @@ export function AppShell() {
   }
 
   const saveLabel =
-    saving || saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' && !dirty ? 'Saved' : 'Save';
+    saving || saveStatus === 'saving'
+      ? 'Saving…'
+      : saveStatus === 'error' && !saving
+        ? 'Save failed'
+        : saveStatus === 'saved' && !dirty
+          ? 'Saved'
+          : 'Save';
 
   if (fullscreen) {
     return (
@@ -103,10 +109,15 @@ export function AppShell() {
     );
   }
 
-  const codeStyle =
-    splitAxis === 'horizontal'
-      ? { flexBasis: `${splitPosition * 100}%` }
-      : { flexBasis: `${splitPosition * 100}%` };
+  // The first-rendered pane (whichever content ends up there once splitSwapped
+  // is applied below) takes the explicit splitPosition share; the second one
+  // grows to fill the rest. Keeping flex-grow tied to DOM position rather than
+  // to the .codeColumn/.previewColumn classes is what lets Swap ⇄ flip which
+  // content is first without also flipping which one gets to grow — pinning
+  // grow to content type instead made the swapped pane balloon and the other
+  // collapse (see AppShell.module.css: neither class carries flex: 1 anymore).
+  const firstPaneStyle = { flexBasis: `${splitPosition * 100}%` };
+  const secondPaneStyle = { flex: 1 };
 
   return (
     <div className={styles.shell}>
@@ -120,7 +131,12 @@ export function AppShell() {
 
       <header className={styles.topBar}>
         <div className={styles.topBarLeft}>
-          <button type="button" className={styles.brandButton} onClick={handleBrandClick} title="My Pages">
+          <button
+            type="button"
+            className={styles.brandButton}
+            onClick={handleBrandClick}
+            title="My Pages"
+          >
             Edith
           </button>
           {pageTitle && <span className={styles.pageTitle}>{pageTitle}</span>}
@@ -161,10 +177,13 @@ export function AppShell() {
         </div>
       </header>
 
-      <div className={splitAxis === 'horizontal' ? styles.mainRow : styles.mainColumn} ref={mainRef}>
+      <div
+        className={splitAxis === 'horizontal' ? styles.mainRow : styles.mainColumn}
+        ref={mainRef}
+      >
         {splitSwapped ? (
           <>
-            <div className={styles.previewColumn} style={codeStyle}>
+            <div className={styles.previewColumn} style={firstPaneStyle}>
               <PreviewPane />
             </div>
             <Splitter
@@ -173,13 +192,13 @@ export function AppShell() {
               onDrag={setSplitPosition}
               onReset={() => setSplitPosition(0.5)}
             />
-            <div className={styles.codeColumn}>
+            <div className={styles.codeColumn} style={secondPaneStyle}>
               <CodePane />
             </div>
           </>
         ) : (
           <>
-            <div className={styles.codeColumn} style={codeStyle}>
+            <div className={styles.codeColumn} style={firstPaneStyle}>
               <CodePane />
             </div>
             <Splitter
@@ -188,7 +207,7 @@ export function AppShell() {
               onDrag={setSplitPosition}
               onReset={() => setSplitPosition(0.5)}
             />
-            <div className={styles.previewColumn}>
+            <div className={styles.previewColumn} style={secondPaneStyle}>
               <PreviewPane />
             </div>
           </>
