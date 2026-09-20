@@ -1,10 +1,35 @@
-.splitter {
-  width: 5px;
-  cursor: col-resize;
+.splitterVertical,
+.splitterHorizontal {
   background: var(--edith-border);
   flex-shrink: 0;
+  touch-action: none;
 }
 
-.splitter:hover {
+.splitterVertical {
+  width: 6px;
+  cursor: col-resize;
+}
+
+.splitterHorizontal {
+  height: 6px;
+  cursor: row-resize;
+}
+
+.splitterVertical:hover,
+.splitterHorizontal:hover {
   background: var(--edith-accent);
+}
+
+.dragging,
+.dragging * {
+  cursor: inherit;
+  user-select: none !important;
+}
+
+body.dragging {
+  cursor: col-resize;
+}
+
+body.dragging:has([aria-orientation='horizontal']) {
+  cursor: row-resize;
 }

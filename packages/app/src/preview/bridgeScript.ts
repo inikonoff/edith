@@ -1,21 +1,35 @@
 import { DATA_ATTR } from '@edith/mapper';
 
 // Injected into every Preview document. Runs inside the sandboxed iframe and
-// talks to the parent exclusively through postMessage (spec §17) — it never
-// has a reference to anything in Edith's own window. Kept as plain ES5-ish
-// JS text (not bundled/transpiled) since it's inlined into user srcdoc HTML
-// as-is, outside our own build pipeline.
+// talks to the parent exclusively through postMessage (spec §17).
 export const PREVIEW_BRIDGE_SCRIPT = `(function () {
   var ATTR = ${JSON.stringify(DATA_ATTR)};
+  var trackedId = null;
 
   function send(payload) {
     payload.source = 'edith-preview';
     window.parent.postMessage(payload, '*');
   }
 
-  function rectOf(el) {
+  function visibleRectOf(el) {
     var r = el.getBoundingClientRect();
-    return { top: r.top, left: r.left, width: r.width, height: r.height };
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var top = Math.max(r.top, 0);
+    var left = Math.max(r.left, 0);
+    var right = Math.min(r.right, vw);
+    var bottom = Math.min(r.bottom, vh);
+    if (right <= left || bottom <= top) return null;
+    return { top: top, left: left, width: right - left, height: bottom - top };
+  }
+
+  function reportTracked() {
+    if (!trackedId) {
+      send({ type: 'edith:rect', id: null, rect: null });
+      return;
+    }
+    var el = document.querySelector('[' + ATTR + '="' + trackedId + '"]');
+    send({ type: 'edith:rect', id: trackedId, rect: el ? visibleRectOf(el) : null });
   }
 
   document.addEventListener(
@@ -26,13 +40,14 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
       var classNames = typeof target.className === 'string'
         ? target.className.split(/\\s+/).filter(Boolean)
         : [];
+      trackedId = target.getAttribute(ATTR);
       send({
         type: 'edith:element-click',
-        id: target.getAttribute(ATTR),
+        id: trackedId,
         tagName: target.tagName.toLowerCase(),
         elementId: target.id || undefined,
         classNames: classNames,
-        rect: rectOf(target),
+        rect: visibleRectOf(target),
       });
     },
     true,
@@ -59,10 +74,18 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
     send({ type: 'edith:error', message: 'Unhandled promise rejection: ' + String(event.reason) });
   });
 
+  window.addEventListener('scroll', function () { reportTracked(); }, true);
+  window.addEventListener('resize', function () { reportTracked(); });
+
   window.addEventListener('message', function (event) {
     var data = event.data;
-    if (!data || data.source === 'edith-preview' || data.type !== 'edith:query-rect') return;
-    var el = document.querySelector('[' + ATTR + '="' + data.id + '"]');
-    send({ type: 'edith:rect', id: data.id, rect: el ? rectOf(el) : null });
+    if (!data || data.source === 'edith-preview') return;
+    if (data.type === 'edith:query-rect') {
+      trackedId = data.id || null;
+      reportTracked();
+    } else if (data.type === 'edith:clear-rect') {
+      trackedId = null;
+      send({ type: 'edith:rect', id: null, rect: null });
+    }
   });
 })();`;

@@ -38,6 +38,15 @@ export function App() {
           if (activeFile && loaded.editorFiles.some((file) => file.path === activeFile)) {
             setActiveFile(activeFile);
           }
+          if (typeof sessionState?.splitPosition === 'number') {
+            useEditorStore.getState().setSplitPosition(sessionState.splitPosition);
+          }
+          if (sessionState?.splitAxis === 'horizontal' || sessionState?.splitAxis === 'vertical') {
+            useEditorStore.getState().setSplitAxis(sessionState.splitAxis);
+          }
+          if (typeof sessionState?.splitSwapped === 'boolean') {
+            useEditorStore.getState().setSplitSwapped(sessionState.splitSwapped);
+          }
         }
       }
       if (!cancelled) setBooting(false);

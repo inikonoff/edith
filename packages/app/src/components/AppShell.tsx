@@ -17,9 +17,14 @@ import styles from './AppShell.module.css';
 export function AppShell() {
   const splitPosition = useEditorStore((state) => state.splitPosition);
   const setSplitPosition = useEditorStore((state) => state.setSplitPosition);
+  const splitAxis = useEditorStore((state) => state.splitAxis);
+  const setSplitAxis = useEditorStore((state) => state.setSplitAxis);
+  const splitSwapped = useEditorStore((state) => state.splitSwapped);
+  const swapPanes = useEditorStore((state) => state.swapPanes);
   const autoUpdate = useEditorStore((state) => state.autoUpdate);
   const setAutoUpdate = useEditorStore((state) => state.setAutoUpdate);
   const dirty = useEditorStore((state) => state.dirty);
+  const saveStatus = useEditorStore((state) => state.saveStatus);
   const markSaved = useEditorStore((state) => state.markSaved);
   const fullscreen = usePreviewStore((state) => state.fullscreen);
   const setFullscreen = usePreviewStore((state) => state.setFullscreen);
@@ -34,7 +39,6 @@ export function AppShell() {
 
   useAutosave();
 
-  // Esc exits fullscreen Preview (spec §26, §40).
   useEffect(() => {
     if (!fullscreen) return;
     function onKeyDown(event: KeyboardEvent) {
@@ -44,7 +48,6 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [fullscreen, setFullscreen]);
 
-  // Native "leave site?" prompt on tab close/reload with unsaved changes.
   useEffect(() => {
     function onBeforeUnload(event: BeforeUnloadEvent) {
       if (!dirty) return;
@@ -88,6 +91,9 @@ export function AppShell() {
     showLauncher();
   }
 
+  const saveLabel =
+    saving || saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' && !dirty ? 'Saved' : 'Save';
+
   if (fullscreen) {
     return (
       <div className={styles.fullscreenShell}>
@@ -96,6 +102,11 @@ export function AppShell() {
       </div>
     );
   }
+
+  const codeStyle =
+    splitAxis === 'horizontal'
+      ? { flexBasis: `${splitPosition * 100}%` }
+      : { flexBasis: `${splitPosition * 100}%` };
 
   return (
     <div className={styles.shell}>
@@ -116,8 +127,24 @@ export function AppShell() {
           {statusMessage && <span className={styles.statusMessage}>{statusMessage}</span>}
         </div>
         <div className={styles.topBarActions}>
+          <button
+            type="button"
+            className={styles.layoutButton}
+            title={splitAxis === 'horizontal' ? 'Stack panes' : 'Place panes side by side'}
+            onClick={() => setSplitAxis(splitAxis === 'horizontal' ? 'vertical' : 'horizontal')}
+          >
+            {splitAxis === 'horizontal' ? 'Layout ⊟' : 'Layout ⊞'}
+          </button>
+          <button
+            type="button"
+            className={styles.layoutButton}
+            title="Swap code and preview"
+            onClick={swapPanes}
+          >
+            Swap ⇄
+          </button>
           <button type="button" disabled={!dirty || saving} onClick={handleSaveClick}>
-            Save
+            {saveLabel}
           </button>
           <ExportMenu />
           <button
@@ -134,14 +161,38 @@ export function AppShell() {
         </div>
       </header>
 
-      <div className={styles.main} ref={mainRef}>
-        <div className={styles.codeColumn} style={{ flexBasis: `${splitPosition * 100}%` }}>
-          <CodePane />
-        </div>
-        <Splitter containerRef={mainRef} onDrag={setSplitPosition} />
-        <div className={styles.previewColumn}>
-          <PreviewPane />
-        </div>
+      <div className={splitAxis === 'horizontal' ? styles.mainRow : styles.mainColumn} ref={mainRef}>
+        {splitSwapped ? (
+          <>
+            <div className={styles.previewColumn} style={codeStyle}>
+              <PreviewPane />
+            </div>
+            <Splitter
+              axis={splitAxis}
+              containerRef={mainRef}
+              onDrag={setSplitPosition}
+              onReset={() => setSplitPosition(0.5)}
+            />
+            <div className={styles.codeColumn}>
+              <CodePane />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.codeColumn} style={codeStyle}>
+              <CodePane />
+            </div>
+            <Splitter
+              axis={splitAxis}
+              containerRef={mainRef}
+              onDrag={setSplitPosition}
+              onReset={() => setSplitPosition(0.5)}
+            />
+            <div className={styles.previewColumn}>
+              <PreviewPane />
+            </div>
+          </>
+        )}
       </div>
 
       <footer className={styles.bottomBar}>

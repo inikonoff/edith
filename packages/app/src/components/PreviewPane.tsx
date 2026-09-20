@@ -106,8 +106,13 @@ export function PreviewPane() {
         }
         case 'edith:rect': {
           const state = usePreviewStore.getState();
-          if (state.selectedEntryId !== data.id) break;
-          selectEntry(String(data.id), (data.rect as Rect | null) ?? null, state.relatedCssRules);
+          const id = data.id == null ? null : String(data.id);
+          if (id && state.selectedEntryId !== id) break;
+          if (!id) {
+            usePreviewStore.setState({ selectedRect: null });
+            break;
+          }
+          selectEntry(id, (data.rect as Rect | null) ?? null, state.relatedCssRules);
           break;
         }
         case 'edith:error':
@@ -133,11 +138,14 @@ export function PreviewPane() {
     if (cursor.path !== mainFile) return;
     const entry = findEntryAtPosition(entries, cursor.line, cursor.column);
     if (!entry) {
+      iframeRef.current?.contentWindow?.postMessage({ type: 'edith:clear-rect' }, '*');
       clearSelection();
       return;
     }
     iframeRef.current?.contentWindow?.postMessage({ type: 'edith:query-rect', id: entry.id }, '*');
-    selectEntry(entry.id, null, []);
+    if (usePreviewStore.getState().selectedEntryId !== entry.id) {
+      selectEntry(entry.id, null, []);
+    }
   }, [cursor, entries, clearSelection, selectEntry]);
 
   const preset = DEVICE_PRESETS[device];

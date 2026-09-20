@@ -2,9 +2,14 @@ import { deletePage, findLocalDependencies, getFileKindFromPath, listPages, type
 import { useCallback, useEffect, useState } from 'react';
 import { formatRelativeDate } from '../page/formatDate';
 import {
+  filesFromDataTransfer,
+  folderProjectFromFiles,
   matchFilesToDependencies,
   pickDependencyFiles,
   pickHtmlFile,
+  pickHtmlFolder,
+  readFolderProject,
+  type PickedFolderProject,
 } from '../page/openLocalFile';
 import { importPage, loadPageForEditor, mimeTypeForPath, type DependencyFileInput } from '../page/pageService';
 import { useEditorStore } from '../store/editorStore';
@@ -48,6 +53,7 @@ export function LauncherScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const refresh = useCallback(async () => {
     const stored = await listPages();
@@ -85,6 +91,66 @@ export function LauncherScreen() {
   async function handleCreateBlankPage() {
     setError(null);
     await finalizeImport('index.html', BLANK_PAGE_TEMPLATE, [], null);
+  }
+
+  async function importFolderProject(raw: PickedFolderProject) {
+    const project = await readFolderProject(raw);
+    if (!project.mainContent) {
+      setError('No HTML file found in this folder.');
+      return;
+    }
+    const dependencies: DependencyFileInput[] = [];
+    for (const entry of project.files) {
+      if (entry.path === project.mainPath) continue;
+      const kind = getFileKindFromPath(entry.path);
+      dependencies.push({
+        path: entry.path,
+        kind,
+        mimeType: entry.file.type || mimeTypeForPath(entry.path),
+        content: kind === 'text' ? await entry.file.text() : entry.file,
+      });
+    }
+    await finalizeImport(project.mainPath, project.mainContent, dependencies, null);
+  }
+
+  async function handleOpenFolder() {
+    setError(null);
+    let picked;
+    try {
+      picked = await pickHtmlFolder();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      return;
+    }
+    if (!picked) return;
+    setBusy(true);
+    try {
+      await importFolderProject(picked);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragOver(false);
+    setError(null);
+    setBusy(true);
+    try {
+      const dropped = await filesFromDataTransfer(event.dataTransfer);
+      const project = folderProjectFromFiles(dropped);
+      if (!project) {
+        setError('Drop an HTML file or a folder that contains one.');
+        return;
+      }
+      await importFolderProject(project);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function handleOpenFile() {
@@ -156,7 +222,15 @@ export function LauncherScreen() {
   }
 
   return (
-    <div className={styles.screen}>
+    <div
+      className={`${styles.screen} ${dragOver ? styles.dragOver : ''}`}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={handleDrop}
+    >
       <header className={styles.header}>
         <h1>Edith</h1>
         <ThemeSwitcher />
@@ -221,6 +295,9 @@ export function LauncherScreen() {
 
         <button type="button" className={styles.openCard} onClick={handleOpenFile} disabled={busy}>
           + Open file
+        </button>
+        <button type="button" className={styles.openCard} onClick={handleOpenFolder} disabled={busy}>
+          + Open folder
         </button>
         <GitHubOpenPanel onImported={refresh} />
       </div>

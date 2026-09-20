@@ -6,6 +6,11 @@
   margin: 0 auto;
 }
 
+.dragOver {
+  outline: 2px dashed var(--edith-accent);
+  outline-offset: -8px;
+}
+
 .header {
   display: flex;
   align-items: center;

@@ -41,21 +41,40 @@
 .topBarActions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
-.main {
+.layoutButton {
+  font-size: 0.85rem;
+}
+
+.mainRow,
+.mainColumn {
   flex: 1;
   display: flex;
   min-height: 0;
+  min-width: 0;
+}
+
+.mainRow {
+  flex-direction: row;
+}
+
+.mainColumn {
+  flex-direction: column;
 }
 
 .codeColumn {
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .previewColumn {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .bottomBar {

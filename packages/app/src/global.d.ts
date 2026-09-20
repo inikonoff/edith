@@ -27,7 +27,18 @@ interface SaveFilePickerOptions {
   types?: FilePickerAcceptType[];
 }
 
+interface FileSystemDirectoryHandle {
+  readonly name: string;
+  readonly kind: 'directory';
+  entries(): AsyncIterableIterator<[string, FileSystemFileHandle | FileSystemDirectoryHandle]>;
+}
+
+interface FileSystemFileHandle {
+  readonly kind?: 'file';
+}
+
 interface Window {
   showOpenFilePicker?(options?: OpenFilePickerOptions): Promise<FileSystemFileHandle[]>;
   showSaveFilePicker?(options?: SaveFilePickerOptions): Promise<FileSystemFileHandle>;
+  showDirectoryPicker?(options?: { mode?: 'read' | 'readwrite' }): Promise<FileSystemDirectoryHandle>;
 }

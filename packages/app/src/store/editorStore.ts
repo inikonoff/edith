@@ -1,5 +1,7 @@
-import { putPageState } from '@edith/core';
+import { putPageState, type SplitAxis } from '@edith/core';
 import { create } from 'zustand';
+
+export type { SplitAxis };
 
 export interface EditorFile {
   path: string;
@@ -22,6 +24,25 @@ export interface CursorState {
 
 export type AppView = 'launcher' | 'editor';
 
+function persistSplit(state: {
+  pageId: string | null;
+  activeFile: string;
+  splitPosition: number;
+  splitAxis: SplitAxis;
+  splitSwapped: boolean;
+}) {
+  if (!state.pageId) return;
+  putPageState({
+    pageId: state.pageId,
+    activeFile: state.activeFile,
+    splitPosition: state.splitPosition,
+    splitAxis: state.splitAxis,
+    splitSwapped: state.splitSwapped,
+  }).catch(() => {
+    /* session hint only */
+  });
+}
+
 interface LoadedPageInput {
   page: { id: string; title: string };
   editorFiles: EditorFile[];
@@ -38,6 +59,9 @@ interface EditorStore {
   dirty: boolean;
   autoUpdate: boolean;
   splitPosition: number;
+  splitAxis: SplitAxis;
+  splitSwapped: boolean;
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error';
   fileHandle: FileSystemFileHandle | null;
   /** Set by a Preview→Code jump; CodePane switches tabs and reveals it, then clears it (spec §20.1). */
   pendingReveal: RevealTarget | null;
@@ -49,6 +73,10 @@ interface EditorStore {
   updateFileContent: (path: string, content: string) => void;
   setAutoUpdate: (value: boolean) => void;
   setSplitPosition: (value: number) => void;
+  setSplitAxis: (axis: SplitAxis) => void;
+  swapPanes: () => void;
+  setSplitSwapped: (value: boolean) => void;
+  setSaveStatus: (status: EditorStore['saveStatus']) => void;
   markSaved: () => void;
   revealPosition: (target: RevealTarget) => void;
   clearPendingReveal: () => void;
@@ -64,6 +92,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   dirty: false,
   autoUpdate: true,
   splitPosition: 0.5,
+  splitAxis: 'horizontal',
+  splitSwapped: false,
+  saveStatus: 'idle',
   fileHandle: null,
   pendingReveal: null,
   cursor: null,
@@ -103,9 +134,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   setAutoUpdate: (value) => set({ autoUpdate: value }),
 
-  setSplitPosition: (value) => set({ splitPosition: value }),
+  setSplitPosition: (value) => {
+    set({ splitPosition: value });
+    persistSplit(get());
+  },
 
-  markSaved: () => set({ dirty: false }),
+  setSplitAxis: (axis) => {
+    set({ splitAxis: axis });
+    persistSplit(get());
+  },
+
+  swapPanes: () => {
+    const state = get();
+    set({
+      splitSwapped: !state.splitSwapped,
+      splitPosition: 1 - state.splitPosition,
+    });
+    persistSplit(get());
+  },
+
+  setSplitSwapped: (value) => {
+    set({ splitSwapped: value });
+    persistSplit(get());
+  },
+
+  setSaveStatus: (saveStatus) => set({ saveStatus }),
+
+  markSaved: () => set({ dirty: false, saveStatus: 'saved' }),
 
   revealPosition: (target) => set({ pendingReveal: target }),
 

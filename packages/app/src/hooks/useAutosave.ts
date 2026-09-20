@@ -10,11 +10,15 @@ export function useAutosave(): void {
   const dirty = useEditorStore((state) => state.dirty);
   const pageId = useEditorStore((state) => state.pageId);
 
+  const setSaveStatus = useEditorStore((state) => state.setSaveStatus);
+
   useEffect(() => {
     if (!dirty || !pageId) return;
-    const timer = setTimeout(() => {
-      saveCurrentPage();
+    const timer = setTimeout(async () => {
+      setSaveStatus('saving');
+      const outcome = await saveCurrentPage();
+      setSaveStatus(outcome.ok ? 'saved' : 'error');
     }, AUTOSAVE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [files, dirty, pageId]);
+  }, [files, dirty, pageId, setSaveStatus]);
 }

@@ -61,6 +61,8 @@ export interface PreviewState {
   device: PreviewDevice;
 }
 
+export type SplitAxis = 'horizontal' | 'vertical';
+
 export interface EditorSessionState {
   pageId: string;
   activeFile: string;
@@ -68,5 +70,7 @@ export interface EditorSessionState {
   selection?: SelectionRange;
   scrollPosition?: ScrollPosition;
   splitPosition?: number;
+  splitAxis?: SplitAxis;
+  splitSwapped?: boolean;
   previewState?: PreviewState;
 }
