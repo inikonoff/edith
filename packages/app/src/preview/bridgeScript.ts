@@ -1,7 +1,5 @@
 import { DATA_ATTR } from '@edith/mapper';
 
-// Injected into every Preview document. Runs inside the sandboxed iframe and
-// talks to the parent exclusively through postMessage (spec §17).
 export const PREVIEW_BRIDGE_SCRIPT = `(function () {
   var ATTR = ${JSON.stringify(DATA_ATTR)};
   var trackedId = null;
@@ -35,19 +33,30 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
   // Native scroll events can fire far faster than once per frame — coalesce
   // bursts (inertial scrolling, resize drags) into at most one report per
   // animation frame instead of a postMessage + parent re-render on every tick.
-  var reportScheduled = false;
-  function scheduleReportTracked() {
-    if (reportScheduled) return;
-    reportScheduled = true;
+  var scrollReportScheduled = false;
+  function scheduleScrollReport() {
+    if (scrollReportScheduled) return;
+    scrollReportScheduled = true;
     requestAnimationFrame(function () {
-      reportScheduled = false;
+      scrollReportScheduled = false;
+      send({ type: 'edith:scroll', x: window.scrollX, y: window.scrollY });
       reportTracked();
     });
+  }
+
+  function isExternalHref(href) {
+    if (!href) return false;
+    return /^(https?:|mailto:|tel:)/i.test(href.trim());
   }
 
   document.addEventListener(
     'click',
     function (event) {
+      var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+      if (link && !isExternalHref(link.getAttribute('href') || '')) {
+        event.preventDefault();
+      }
+
       var target = event.target && event.target.closest ? event.target.closest('[' + ATTR + ']') : null;
       if (!target) return;
       var classNames = typeof target.className === 'string'
@@ -87,26 +96,37 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
     send({ type: 'edith:error', message: 'Unhandled promise rejection: ' + String(event.reason) });
   });
 
-  window.addEventListener('scroll', function () { scheduleReportTracked(); }, true);
-  window.addEventListener('resize', function () { scheduleReportTracked(); });
+  window.addEventListener('scroll', function () { scheduleScrollReport(); }, true);
+  window.addEventListener('resize', function () { scheduleScrollReport(); });
 
   window.addEventListener('message', function (event) {
     var data = event.data;
     if (!data || data.source === 'edith-preview') return;
     if (data.type === 'edith:query-rect') {
       trackedId = data.id || null;
-      var trackedEl = trackedId ? document.querySelector('[' + ATTR + '="' + trackedId + '"]') : null;
-      if (trackedEl && data.scroll) {
+      var el = trackedId ? document.querySelector('[' + ATTR + '="' + trackedId + '"]') : null;
+      if (el && data.scroll) {
         try {
-          trackedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-        } catch (e) {
-          trackedEl.scrollIntoView(true);
+          el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        } catch (err) {
+          el.scrollIntoView(true);
         }
       }
       reportTracked();
     } else if (data.type === 'edith:clear-rect') {
       trackedId = null;
       send({ type: 'edith:rect', id: null, rect: null });
+    } else if (data.type === 'edith:set-scroll') {
+      window.scrollTo(data.x || 0, data.y || 0);
+      reportTracked();
+    } else if (data.type === 'edith:replace-css') {
+      var files = data.files || [];
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var style = document.querySelector('style[data-edith-src="' + file.path + '"]');
+        if (style) style.textContent = file.content || '';
+      }
+      reportTracked();
     }
   });
 })();`;

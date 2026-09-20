@@ -36,6 +36,9 @@ export function PreviewPane() {
   const problems = usePreviewStore((state) => state.problems);
   const addProblem = usePreviewStore((state) => state.addProblem);
   const setBuildResult = usePreviewStore((state) => state.setBuildResult);
+  const patchBuildMeta = usePreviewStore((state) => state.patchBuildMeta);
+  const lastFilesRef = useRef<Map<string, string>>(new Map());
+  const lastScrollRef = useRef({ x: 0, y: 0 });
   const selectedRect = usePreviewStore((state) => state.selectedRect);
   const selectedEntryId = usePreviewStore((state) => state.selectedEntryId);
   const relatedCssRules = usePreviewStore((state) => state.relatedCssRules);
@@ -44,26 +47,44 @@ export function PreviewPane() {
   const manualUpdateRequestId = usePreviewStore((state) => state.manualUpdateRequestId);
   const openAskEdith = useAskEdithStore((state) => state.openPanel);
 
-  const rebuild = useCallback(() => {
-    const state = useEditorStore.getState();
-    const mainFile = getMainFilePath(state.files);
-    if (!mainFile) return;
-    const result = buildPreviewDocument(
-      mainFile,
-      state.files.map((file) => ({ path: file.path, content: file.content })),
-    );
-    setBuildResult(result);
-  }, [setBuildResult]);
+  const rebuild = useCallback(
+    (forceFull = false) => {
+      const state = useEditorStore.getState();
+      const mainFile = getMainFilePath(state.files);
+      if (!mainFile) return;
+      const snapshot = state.files.map((file) => ({ path: file.path, content: file.content }));
+      const previous = lastFilesRef.current;
+      const changed = snapshot.filter((file) => previous.get(file.path) !== file.content);
+      lastFilesRef.current = new Map(snapshot.map((file) => [file.path, file.content]));
 
-  // Initial render and the explicit "Update preview" button (available in both modes, spec §18).
+      const result = buildPreviewDocument(mainFile, snapshot);
+
+      const cssOnly =
+        !forceFull &&
+        previous.size > 0 &&
+        changed.length > 0 &&
+        changed.every((file) => file.path.toLowerCase().endsWith('.css'));
+      if (cssOnly) {
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'edith:replace-css', files: changed },
+          '*',
+        );
+        patchBuildMeta({ entries: result.entries, missingResources: result.missingResources });
+        return;
+      }
+
+      setBuildResult(result);
+    },
+    [patchBuildMeta, setBuildResult],
+  );
+
   useEffect(() => {
-    rebuild();
+    rebuild(true);
   }, [rebuild, manualUpdateRequestId]);
 
-  // Auto Update: re-render a short debounce after edits stop (spec §18).
   useEffect(() => {
     if (!autoUpdate) return;
-    const timer = setTimeout(rebuild, AUTO_UPDATE_DEBOUNCE_MS);
+    const timer = setTimeout(() => rebuild(false), AUTO_UPDATE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [files, autoUpdate, rebuild]);
 
@@ -123,6 +144,9 @@ export function PreviewPane() {
             kind: 'warning',
             message: `Failed to load ${String(data.tagName)}: ${String(data.src)}`,
           });
+          break;
+        case 'edith:scroll':
+          lastScrollRef.current = { x: Number(data.x) || 0, y: Number(data.y) || 0 };
           break;
         default:
           break;
@@ -211,6 +235,13 @@ export function PreviewPane() {
               title="Preview"
               sandbox="allow-scripts"
               srcDoc={srcDoc}
+              onLoad={() => {
+                const { x, y } = lastScrollRef.current;
+                iframeRef.current?.contentWindow?.postMessage(
+                  { type: 'edith:set-scroll', x, y },
+                  '*',
+                );
+              }}
             />
             <SelectionOverlay rect={selectedRect} iframeEl={iframeRef.current} />
           </div>

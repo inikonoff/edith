@@ -54,6 +54,7 @@ interface PreviewStore {
   relatedCssRules: MatchedCssRule[];
   manualUpdateRequestId: number;
   setBuildResult: (result: PreviewBuildResult) => void;
+  patchBuildMeta: (meta: Pick<PreviewBuildResult, 'entries' | 'missingResources'>) => void;
   setDevice: (device: PreviewDevice) => void;
   setZoom: (zoom: number) => void;
   zoomIn: () => void;
@@ -100,6 +101,8 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
       selectedElementInfo: null,
     })),
 
+  patchBuildMeta: ({ entries, missingResources }) => set({ entries, missingResources }),
+
   setDevice: (device) => set({ device }),
 
   setZoom: (zoom) => set({ zoom: clampZoom(zoom) }),
@@ -116,7 +119,12 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
     set((state) => ({ problems: [...state.problems, { ...problem, id: problemCounter++ }] })),
 
   clearSelection: () =>
-    set({ selectedEntryId: null, selectedRect: null, relatedCssRules: [], selectedElementInfo: null }),
+    set({
+      selectedEntryId: null,
+      selectedRect: null,
+      relatedCssRules: [],
+      selectedElementInfo: null,
+    }),
 
   selectEntry: (id, rect, relatedCssRules, elementInfo) =>
     set((state) => ({
@@ -126,5 +134,6 @@ export const usePreviewStore = create<PreviewStore>((set) => ({
       selectedElementInfo: elementInfo ?? state.selectedElementInfo,
     })),
 
-  requestManualUpdate: () => set((state) => ({ manualUpdateRequestId: state.manualUpdateRequestId + 1 })),
+  requestManualUpdate: () =>
+    set((state) => ({ manualUpdateRequestId: state.manualUpdateRequestId + 1 })),
 }));
