@@ -1,5 +1,7 @@
 .splitterVertical,
 .splitterHorizontal {
+  position: relative;
+  z-index: 4;
   background: var(--edith-border);
   flex-shrink: 0;
   touch-action: none;
@@ -15,7 +17,30 @@
   cursor: row-resize;
 }
 
+/* Wider grab area without covering the panes visually */
+.splitterVertical::before,
+.splitterHorizontal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.splitterVertical::before {
+  left: -4px;
+  right: -4px;
+}
+
+.splitterHorizontal::before {
+  top: -4px;
+  bottom: -4px;
+}
+
 .splitterVertical:hover,
 .splitterHorizontal:hover {
+  background: color-mix(in srgb, var(--edith-accent) 45%, var(--edith-border));
+}
+
+.splitterVertical.isDragging,
+.splitterHorizontal.isDragging {
   background: var(--edith-accent);
 }

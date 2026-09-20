@@ -119,7 +119,10 @@ export function PreviewPane() {
           addProblem({ kind: 'error', message: String(data.message) });
           break;
         case 'edith:resource-error':
-          addProblem({ kind: 'warning', message: `Failed to load ${String(data.tagName)}: ${String(data.src)}` });
+          addProblem({
+            kind: 'warning',
+            message: `Failed to load ${String(data.tagName)}: ${String(data.src)}`,
+          });
           break;
         default:
           break;
@@ -142,8 +145,12 @@ export function PreviewPane() {
       clearSelection();
       return;
     }
-    iframeRef.current?.contentWindow?.postMessage({ type: 'edith:query-rect', id: entry.id }, '*');
-    if (usePreviewStore.getState().selectedEntryId !== entry.id) {
+    const shouldScroll = usePreviewStore.getState().selectedEntryId !== entry.id;
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: 'edith:query-rect', id: entry.id, scroll: shouldScroll },
+      '*',
+    );
+    if (shouldScroll) {
       selectEntry(entry.id, null, []);
     }
   }, [cursor, entries, clearSelection, selectEntry]);

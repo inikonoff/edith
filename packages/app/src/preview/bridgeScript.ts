@@ -95,6 +95,14 @@ export const PREVIEW_BRIDGE_SCRIPT = `(function () {
     if (!data || data.source === 'edith-preview') return;
     if (data.type === 'edith:query-rect') {
       trackedId = data.id || null;
+      var trackedEl = trackedId ? document.querySelector('[' + ATTR + '="' + trackedId + '"]') : null;
+      if (trackedEl && data.scroll) {
+        try {
+          trackedEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        } catch (e) {
+          trackedEl.scrollIntoView(true);
+        }
+      }
       reportTracked();
     } else if (data.type === 'edith:clear-rect') {
       trackedId = null;

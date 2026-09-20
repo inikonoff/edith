@@ -109,15 +109,31 @@ export function AppShell() {
     );
   }
 
-  // The first-rendered pane (whichever content ends up there once splitSwapped
-  // is applied below) takes the explicit splitPosition share; the second one
-  // grows to fill the rest. Keeping flex-grow tied to DOM position rather than
-  // to the .codeColumn/.previewColumn classes is what lets Swap ⇄ flip which
-  // content is first without also flipping which one gets to grow — pinning
-  // grow to content type instead made the swapped pane balloon and the other
-  // collapse (see AppShell.module.css: neither class carries flex: 1 anymore).
+  // CodePane/PreviewPane are always rendered in the same JSX position, and
+  // Swap ⇄ only changes their flex `order` (-1/1, with the Splitter fixed at
+  // the default 0 so it always ends up between them) — not which JSX branch
+  // renders which component. Conditionally swapping JSX branches instead
+  // would put a different component type at the same tree position on each
+  // toggle, so React would unmount and remount both CodePane and PreviewPane
+  // (losing Monaco's undo history/scroll/cursor and reloading the preview
+  // iframe) on every single Swap click.
+  //
+  // Whichever pane ends up visually first (order -1) takes the explicit
+  // splitPosition share; the other (order 1) grows to fill the rest — kept
+  // as inline style rather than baked into the .codeColumn/.previewColumn
+  // classes so grow/basis follow visual position, not content type (pinning
+  // grow to content type made the swapped pane balloon and the other
+  // collapse; see AppShell.module.css, neither class carries flex: 1).
   const firstPaneStyle = { flexBasis: `${splitPosition * 100}%` };
   const secondPaneStyle = { flex: 1 };
+  const codeStyle = {
+    order: splitSwapped ? 1 : -1,
+    ...(splitSwapped ? secondPaneStyle : firstPaneStyle),
+  };
+  const previewStyle = {
+    order: splitSwapped ? -1 : 1,
+    ...(splitSwapped ? firstPaneStyle : secondPaneStyle),
+  };
 
   return (
     <div className={styles.shell}>
@@ -181,37 +197,18 @@ export function AppShell() {
         className={splitAxis === 'horizontal' ? styles.mainRow : styles.mainColumn}
         ref={mainRef}
       >
-        {splitSwapped ? (
-          <>
-            <div className={styles.previewColumn} style={firstPaneStyle}>
-              <PreviewPane />
-            </div>
-            <Splitter
-              axis={splitAxis}
-              containerRef={mainRef}
-              onDrag={setSplitPosition}
-              onReset={() => setSplitPosition(0.5)}
-            />
-            <div className={styles.codeColumn} style={secondPaneStyle}>
-              <CodePane />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={styles.codeColumn} style={firstPaneStyle}>
-              <CodePane />
-            </div>
-            <Splitter
-              axis={splitAxis}
-              containerRef={mainRef}
-              onDrag={setSplitPosition}
-              onReset={() => setSplitPosition(0.5)}
-            />
-            <div className={styles.previewColumn} style={secondPaneStyle}>
-              <PreviewPane />
-            </div>
-          </>
-        )}
+        <div className={styles.codeColumn} style={codeStyle}>
+          <CodePane />
+        </div>
+        <Splitter
+          axis={splitAxis}
+          containerRef={mainRef}
+          onDrag={setSplitPosition}
+          onReset={() => setSplitPosition(0.5)}
+        />
+        <div className={styles.previewColumn} style={previewStyle}>
+          <PreviewPane />
+        </div>
       </div>
 
       <footer className={styles.bottomBar}>
