@@ -1,7 +1,15 @@
-import { getGroqKey, getOpenRouterKey, setGroqKey, setOpenRouterKey, type AskLevel, type ContextMode } from '@edith/ai';
+import {
+  getGroqKey,
+  getOpenRouterKey,
+  setGroqKey,
+  setOpenRouterKey,
+  type AskLevel,
+  type ContextMode,
+} from '@edith/ai';
 import { useState } from 'react';
 import { useAskEdithStore } from '../store/askEdithStore';
 import { DiffView } from './DiffView';
+import { Icon } from './Icon';
 import styles from './AskEdithPanel.module.css';
 
 const LEVELS: { value: AskLevel; label: string }[] = [
@@ -58,8 +66,13 @@ export function AskEdithPanel() {
       <div className={styles.panel} onClick={(event) => event.stopPropagation()}>
         <div className={styles.header}>
           <h2>Ask Edith</h2>
-          <button type="button" className={styles.closeButton} onClick={closePanel} aria-label="Close">
-            ×
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={closePanel}
+            aria-label="Close"
+          >
+            <Icon name="close" />
           </button>
         </div>
 
@@ -93,7 +106,9 @@ export function AskEdithPanel() {
 
         {level === 'fix' && (
           <p className={styles.hint}>
-            {problemMessage ? `Reported error: ${problemMessage}` : 'No error selected — open this from a problem in the Preview.'}
+            {problemMessage
+              ? `Reported error: ${problemMessage}`
+              : 'No error selected — open this from a problem in the Preview.'}
           </p>
         )}
 
@@ -109,7 +124,11 @@ export function AskEdithPanel() {
           </label>
         )}
 
-        <button type="button" className={styles.keysToggle} onClick={() => setShowKeys((value) => !value)}>
+        <button
+          type="button"
+          className={styles.keysToggle}
+          onClick={() => setShowKeys((value) => !value)}
+        >
           {showKeys ? '▾' : '▸'} API keys
         </button>
         {showKeys && (
@@ -137,7 +156,12 @@ export function AskEdithPanel() {
 
         {!reviewing && (
           <div className={styles.actions}>
-            <button type="button" onClick={handleSubmit} disabled={busy}>
+            <button
+              type="button"
+              className="edith-btn-primary"
+              onClick={handleSubmit}
+              disabled={busy}
+            >
               {status === 'loading' ? 'Thinking…' : 'Ask'}
             </button>
           </div>
@@ -149,7 +173,7 @@ export function AskEdithPanel() {
             <DiffView edits={edits} />
             <div className={styles.actions}>
               {edits.length > 0 && (
-                <button type="button" onClick={approve}>
+                <button type="button" className="edith-btn-primary" onClick={approve}>
                   Approve
                 </button>
               )}

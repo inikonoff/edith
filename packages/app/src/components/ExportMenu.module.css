@@ -1,31 +1,41 @@
 .wrap {
   position: relative;
+  display: flex;
 }
 
 .menu {
   position: absolute;
   top: 100%;
-  right: 0;
-  z-index: 10;
-  margin-top: 0.25rem;
+  left: 0;
+  z-index: 20;
+  margin-top: 4px;
   display: flex;
   flex-direction: column;
   min-width: 140px;
+  padding: 3px;
   background: var(--edith-bg);
-  border: 1px solid var(--edith-border);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  border: 1px solid var(--edith-border-strong);
+  border-radius: var(--edith-radius);
+  box-shadow: var(--edith-shadow-pop);
 }
 
 .menu button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 22px;
+  box-shadow: none;
+  padding: 0 8px;
   border: none;
+  border-radius: 3px;
   background: none;
+  color: var(--edith-fg-secondary);
+  font-size: var(--edith-font-ui);
   text-align: left;
-  padding: 0.4rem 0.7rem;
   cursor: pointer;
 }
 
 .menu button:hover {
-  background: var(--edith-bg-alt);
+  background: var(--edith-bg-hover);
+  color: var(--edith-fg);
 }

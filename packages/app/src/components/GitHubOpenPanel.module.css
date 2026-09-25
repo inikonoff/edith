@@ -45,9 +45,9 @@
 
 .error {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #dc9a00;
-  background: #fff7e6;
-  color: #8a5a00;
+  border: 1px solid var(--edith-warning-border);
+  background: var(--edith-warning-bg);
+  color: var(--edith-warning-fg);
   border-radius: 4px;
   font-size: 0.85rem;
 }
@@ -61,13 +61,16 @@
 }
 
 .fileList button {
+  display: block;
   width: 100%;
+  height: auto;
+  box-shadow: none;
   text-align: left;
   padding: 0.35rem 0.5rem;
   border: none;
   background: none;
   cursor: pointer;
-  font-family: monospace;
+  font-family: var(--edith-font-mono);
   font-size: 0.85rem;
 }
 

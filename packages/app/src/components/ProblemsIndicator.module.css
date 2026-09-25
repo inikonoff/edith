@@ -1,54 +1,75 @@
 .wrap {
   position: relative;
+  display: flex;
 }
 
 .badge {
-  padding: 0.2rem 0.6rem;
-  font-size: 0.8rem;
-  border: 1px solid #dc9a00;
-  background: #fff7e6;
-  color: #8a5a00;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--edith-h-control-sm);
+  padding: 0 8px;
+  font-size: var(--edith-font-ui-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  border: 0.8px solid var(--edith-warning-border);
+  background: var(--edith-warning-bg);
+  color: var(--edith-warning-fg);
+  border-radius: var(--edith-radius);
   cursor: pointer;
+}
+
+.badgeError {
+  border-color: var(--edith-danger-border);
+  background: var(--edith-danger-bg);
+  color: var(--edith-danger-fg);
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
 }
 
 .details {
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 10;
-  margin: 0.25rem 0 0;
-  padding: 0.5rem;
+  z-index: 20;
+  margin: 4px 0 0;
+  padding: 6px 8px;
   min-width: 260px;
   max-width: 420px;
   max-height: 240px;
   overflow-y: auto;
   list-style: none;
   background: var(--edith-bg);
-  border: 1px solid var(--edith-border);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  font-size: 0.8rem;
+  border: 1px solid var(--edith-border-strong);
+  border-radius: var(--edith-radius);
+  box-shadow: var(--edith-shadow-pop);
+  font-size: var(--edith-font-ui);
 }
 
 .error {
-  color: #b00020;
-  padding: 0.15rem 0;
+  color: var(--edith-danger-fg);
+  padding: 3px 0;
 }
 
 .warning {
-  color: #8a5a00;
-  padding: 0.15rem 0;
+  color: var(--edith-warning-fg);
+  padding: 3px 0;
 }
 
 .fixLink {
   display: block;
-  margin-top: 0.1rem;
+  margin-top: 2px;
   border: none;
   background: none;
   padding: 0;
-  color: inherit;
+  color: var(--edith-accent);
   text-decoration: underline;
-  font-size: 0.75rem;
+  font-size: var(--edith-font-ui-sm);
   cursor: pointer;
 }

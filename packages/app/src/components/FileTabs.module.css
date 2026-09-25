@@ -1,22 +1,41 @@
 .tabs {
+  flex-shrink: 0;
   display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: var(--edith-h-panehead);
+  padding: 0 12px;
+  background: var(--edith-bg-sunken);
   border-bottom: 1px solid var(--edith-border);
-  background: var(--edith-bg-alt);
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
 
 .tab {
-  padding: 0.4rem 0.9rem;
+  position: relative;
+  height: 20px;
+  padding: 0 10px;
   border: none;
-  border-right: 1px solid var(--edith-border);
+  border-radius: 2px 2px 0 0;
   background: transparent;
   color: var(--edith-fg-muted);
-  cursor: pointer;
+  font-size: var(--edith-font-ui);
+  line-height: 20px;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--edith-fg);
 }
 
 .tabActive {
   background: var(--edith-bg);
   color: var(--edith-fg);
   font-weight: 600;
+  /* Сдвиг на 1px вниз перекрывает нижнюю границу полосы — вкладка «сливается» с редактором. */
+  margin-bottom: -1px;
+  height: 21px;
+  box-shadow: inset 0 1.8px 0 var(--edith-accent);
 }

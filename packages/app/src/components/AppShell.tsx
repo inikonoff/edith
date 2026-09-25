@@ -8,6 +8,7 @@ import { usePreviewStore } from '../store/previewStore';
 import { AskEdithPanel } from './AskEdithPanel';
 import { CodePane } from './CodePane';
 import { ExportMenu } from './ExportMenu';
+import { Icon } from './Icon';
 import { PreviewPane } from './PreviewPane';
 import { Splitter } from './Splitter';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -30,6 +31,8 @@ export function AppShell() {
   const setFullscreen = usePreviewStore((state) => state.setFullscreen);
   const requestManualUpdate = usePreviewStore((state) => state.requestManualUpdate);
   const pageTitle = useEditorStore((state) => state.pageTitle);
+  const cursor = useEditorStore((state) => state.cursor);
+  const activeFile = useEditorStore((state) => state.activeFile);
   const showLauncher = useEditorStore((state) => state.showLauncher);
   const openAskEdith = useAskEdithStore((state) => state.openPanel);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -100,6 +103,17 @@ export function AppShell() {
           ? 'Saved'
           : 'Save';
 
+  const status =
+    saving || saveStatus === 'saving'
+      ? { label: 'Saving…', tone: styles.dotBusy }
+      : saveStatus === 'error'
+        ? { label: 'Save failed', tone: styles.dotError }
+        : dirty
+          ? { label: 'Unsaved', tone: styles.dotIdle }
+          : { label: saveStatus === 'saved' ? 'Saved' : 'Ready', tone: styles.dotOk };
+  const cursorLabel =
+    cursor && cursor.path === activeFile ? `Ln ${cursor.line}, Col ${cursor.column}` : null;
+
   if (fullscreen) {
     return (
       <div className={styles.fullscreenShell}>
@@ -145,8 +159,8 @@ export function AppShell() {
         />
       )}
 
-      <header className={styles.topBar}>
-        <div className={styles.topBarLeft}>
+      <header className={styles.menuBar}>
+        <div className={styles.menuLeft}>
           <button
             type="button"
             className={styles.brandButton}
@@ -155,43 +169,79 @@ export function AppShell() {
           >
             Edith
           </button>
-          {pageTitle && <span className={styles.pageTitle}>{pageTitle}</span>}
+          {pageTitle && (
+            <>
+              <span className={styles.divider} aria-hidden="true" />
+              <span className={styles.pageTitle}>{pageTitle}</span>
+            </>
+          )}
           {statusMessage && <span className={styles.statusMessage}>{statusMessage}</span>}
         </div>
-        <div className={styles.topBarActions}>
+        <ThemeSwitcher />
+      </header>
+
+      <div className={styles.toolbar} role="toolbar" aria-label="Page actions">
+        <div className={styles.toolbarGroup}>
           <button
             type="button"
-            className={styles.layoutButton}
+            className="edith-btn-primary"
+            title="Update preview (Ctrl/Cmd+Enter)"
+            onClick={requestManualUpdate}
+          >
+            <Icon name="play" size={11} />
+            Run
+          </button>
+          <button
+            type="button"
+            className="edith-btn"
+            title="Save (Ctrl/Cmd+S)"
+            disabled={!dirty || saving}
+            onClick={handleSaveClick}
+          >
+            <Icon name="save" />
+            {saveLabel}
+          </button>
+          <span className={styles.separator} aria-hidden="true" />
+          <button
+            type="button"
+            className="edith-btn"
             title={splitAxis === 'horizontal' ? 'Stack panes' : 'Place panes side by side'}
             onClick={() => setSplitAxis(splitAxis === 'horizontal' ? 'vertical' : 'horizontal')}
           >
-            {splitAxis === 'horizontal' ? 'Layout ⊟' : 'Layout ⊞'}
+            <Icon name={splitAxis === 'horizontal' ? 'columns' : 'rows'} />
+            Layout
           </button>
           <button
             type="button"
-            className={styles.layoutButton}
+            className="edith-btn"
             title="Swap code and preview"
             onClick={swapPanes}
           >
-            Swap ⇄
+            <Icon name="swap" />
+            Swap
           </button>
-          <button type="button" disabled={!dirty || saving} onClick={handleSaveClick}>
-            {saveLabel}
-          </button>
+          <span className={styles.separator} aria-hidden="true" />
           <ExportMenu />
           <button
             type="button"
+            className="edith-btn"
             title="Ask Edith about the whole page"
             onClick={() => openAskEdith({ level: 'create', contextMode: 'page' })}
           >
+            <Icon name="sparkle" />
             Ask Edith
           </button>
-          <button type="button" title="Fullscreen preview" onClick={() => setFullscreen(true)}>
-            Preview ⛶
-          </button>
-          <ThemeSwitcher />
         </div>
-      </header>
+        <button
+          type="button"
+          className="edith-btn"
+          title="Fullscreen preview (Esc to exit)"
+          onClick={() => setFullscreen(true)}
+        >
+          <Icon name="maximize" />
+          Fullscreen
+        </button>
+      </div>
 
       <div
         className={splitAxis === 'horizontal' ? styles.mainRow : styles.mainColumn}
@@ -211,8 +261,16 @@ export function AppShell() {
         </div>
       </div>
 
-      <footer className={styles.bottomBar}>
-        <label>
+      <footer className={styles.statusBar}>
+        <div className={styles.statusLeft}>
+          <span className={styles.statusItem}>
+            <span className={`${styles.dot} ${status.tone}`} aria-hidden="true" />
+            {status.label}
+          </span>
+          {cursorLabel && <span className={styles.statusMuted}>{cursorLabel}</span>}
+          <span className={styles.statusMuted}>UTF-8</span>
+        </div>
+        <label className={styles.statusItem} title="Rebuild the preview while you type">
           <input
             type="checkbox"
             checked={autoUpdate}
@@ -220,9 +278,6 @@ export function AppShell() {
           />
           Auto update
         </label>
-        <button type="button" onClick={requestManualUpdate}>
-          Update preview
-        </button>
       </footer>
 
       <AskEdithPanel />

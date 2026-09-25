@@ -8,7 +8,9 @@ interface FileTabsProps {
 }
 
 export function FileTabs({ files, activeFile, onSelect }: FileTabsProps) {
-  if (files.length <= 1) return null;
+  // Always shown — even for a single file — so the code pane header lines
+  // up with the preview toolbar next to it.
+  if (files.length === 0) return null;
 
   return (
     <div className={styles.tabs} role="tablist">

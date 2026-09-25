@@ -1,8 +1,60 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 19px;
+  min-width: 122px;
+  padding: 0 22px 0 10px;
+  background: var(--edith-btn-bg);
+  border: 0.8px solid var(--edith-btn-border);
+  border-radius: var(--edith-radius);
+  box-shadow: var(--edith-shadow-btn);
+  color: var(--edith-btn-fg);
+  font-size: var(--edith-font-ui-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.wrap:hover {
+  background: var(--edith-btn-bg-hover);
+}
+
+.prefix {
+  margin-right: 5px;
+  pointer-events: none;
+}
+
+/* Нативный select растянут на всю «кнопку» — кликабельна вся площадь,
+   а список опций остаётся системным (доступность, мобильные). */
 .select {
-  padding: 0.2rem 0.4rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--edith-border);
-  border-radius: 4px;
-  background: var(--edith-bg);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: 0 22px 0 52px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--edith-focus-ring);
+  border-radius: var(--edith-radius);
+}
+
+.select option {
   color: var(--edith-fg);
+  background: var(--edith-bg);
+}
+
+.chevron {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  margin-top: -3px;
+  color: var(--edith-fg-muted);
+  pointer-events: none;
 }

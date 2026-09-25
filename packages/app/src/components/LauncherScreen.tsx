@@ -1,4 +1,10 @@
-import { deletePage, findLocalDependencies, getFileKindFromPath, listPages, type PageRecord } from '@edith/core';
+import {
+  deletePage,
+  findLocalDependencies,
+  getFileKindFromPath,
+  listPages,
+  type PageRecord,
+} from '@edith/core';
 import { useCallback, useEffect, useState } from 'react';
 import { formatRelativeDate } from '../page/formatDate';
 import {
@@ -11,7 +17,12 @@ import {
   readFolderProject,
   type PickedFolderProject,
 } from '../page/openLocalFile';
-import { importPage, loadPageForEditor, mimeTypeForPath, type DependencyFileInput } from '../page/pageService';
+import {
+  importPage,
+  loadPageForEditor,
+  mimeTypeForPath,
+  type DependencyFileInput,
+} from '../page/pageService';
 import { useEditorStore } from '../store/editorStore';
 import { GitHubOpenPanel } from './GitHubOpenPanel';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -206,7 +217,12 @@ export function LauncherScreen() {
 
   async function handleSkipDependencies() {
     if (!pendingImport) return;
-    await finalizeImport(pendingImport.mainPath, pendingImport.mainContent, [], pendingImport.fileHandle);
+    await finalizeImport(
+      pendingImport.mainPath,
+      pendingImport.mainContent,
+      [],
+      pendingImport.fileHandle,
+    );
   }
 
   async function handleOpenPage(pageId: string) {
@@ -247,7 +263,12 @@ export function LauncherScreen() {
             ))}
           </ul>
           <div className={styles.dependencyActions}>
-            <button type="button" onClick={handleLoadDependencies} disabled={busy}>
+            <button
+              type="button"
+              className="edith-btn-primary"
+              onClick={handleLoadDependencies}
+              disabled={busy}
+            >
               Load dependencies
             </button>
             <button type="button" onClick={handleSkipDependencies} disabled={busy}>
@@ -259,13 +280,22 @@ export function LauncherScreen() {
 
       <h2 className={styles.sectionTitle}>My Pages</h2>
       <div className={styles.grid}>
-        <button type="button" className={styles.openCard} onClick={handleCreateBlankPage} disabled={busy}>
+        <button
+          type="button"
+          className={styles.openCard}
+          onClick={handleCreateBlankPage}
+          disabled={busy}
+        >
           + Blank Page
         </button>
 
         {pages.map((page) => (
           <div key={page.id} className={styles.card}>
-            <button type="button" className={styles.cardBody} onClick={() => handleOpenPage(page.id)}>
+            <button
+              type="button"
+              className={styles.cardBody}
+              onClick={() => handleOpenPage(page.id)}
+            >
               <strong>{page.title}</strong>
               <span className={styles.mainFile}>{page.mainFile}</span>
               <span className={styles.date}>{formatRelativeDate(page.updatedAt)}</span>
@@ -296,7 +326,12 @@ export function LauncherScreen() {
         <button type="button" className={styles.openCard} onClick={handleOpenFile} disabled={busy}>
           + Open file
         </button>
-        <button type="button" className={styles.openCard} onClick={handleOpenFolder} disabled={busy}>
+        <button
+          type="button"
+          className={styles.openCard}
+          onClick={handleOpenFolder}
+          disabled={busy}
+        >
           + Open folder
         </button>
         <GitHubOpenPanel onImported={refresh} />

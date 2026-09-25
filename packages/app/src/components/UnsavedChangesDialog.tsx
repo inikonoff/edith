@@ -13,7 +13,7 @@ export function UnsavedChangesDialog({ onSave, onDiscard, onCancel }: UnsavedCha
       <div className={styles.dialog} onClick={(event) => event.stopPropagation()}>
         <p>There are unsaved changes.</p>
         <div className={styles.actions}>
-          <button type="button" onClick={onSave}>
+          <button type="button" className="edith-btn-primary" onClick={onSave}>
             Save
           </button>
           <button type="button" onClick={onDiscard}>

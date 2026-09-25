@@ -1,12 +1,12 @@
 .panel {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 6px;
   flex-wrap: wrap;
-  padding: 0.3rem 0.6rem;
+  padding: 4px 12px;
   border-bottom: 1px solid var(--edith-border);
-  font-size: 0.78rem;
-  background: var(--edith-bg-alt);
+  font-size: var(--edith-font-ui);
+  background: var(--edith-bg-toolbar);
 }
 
 .label {
@@ -14,13 +14,21 @@
 }
 
 .chip {
-  padding: 0.1rem 0.5rem;
-  border: 1px solid var(--edith-border);
+  height: var(--edith-h-control-sm);
+  padding: 0 8px;
+  border: 0.8px solid var(--edith-btn-border);
   border-radius: 999px;
-  background: var(--edith-bg);
+  background: var(--edith-btn-bg);
+  color: var(--edith-fg-secondary);
+  font-family: var(--edith-font-mono);
+  font-size: var(--edith-font-ui-sm);
   cursor: pointer;
 }
 
+.chip:hover {
+  background: var(--edith-btn-bg-hover);
+}
+
 .location {
-  color: var(--edith-fg-muted);
+  color: var(--edith-fg-subtle);
 }

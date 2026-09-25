@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useDismiss } from '../hooks/useDismiss';
 import { exportHtml, exportZip } from '../page/saveExport';
 import { getMainFilePath, useEditorStore } from '../store/editorStore';
+import { Icon } from './Icon';
 import styles from './ExportMenu.module.css';
 
 export function ExportMenu() {
   const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(wrapRef, open, close);
   const files = useEditorStore((state) => state.files);
   const pageId = useEditorStore((state) => state.pageId);
   const pageTitle = useEditorStore((state) => state.pageTitle);
@@ -36,16 +41,24 @@ export function ExportMenu() {
   }
 
   return (
-    <div className={styles.wrap}>
-      <button type="button" onClick={() => setOpen((value) => !value)}>
-        Export ▾
+    <div className={styles.wrap} ref={wrapRef}>
+      <button
+        type="button"
+        className="edith-btn"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <Icon name="download" />
+        Export
+        <Icon name="chevronDown" size={10} />
       </button>
       {open && (
-        <div className={styles.menu}>
-          <button type="button" onClick={handleExportHtml}>
+        <div className={styles.menu} role="menu">
+          <button type="button" role="menuitem" onClick={handleExportHtml}>
             Export HTML
           </button>
-          <button type="button" onClick={handleExportZip}>
+          <button type="button" role="menuitem" onClick={handleExportZip}>
             Export ZIP
           </button>
         </div>

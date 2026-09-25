@@ -2,18 +2,22 @@
 .splitterHorizontal {
   position: relative;
   z-index: 4;
-  background: var(--edith-border);
+  background: var(--edith-bg-sunken);
   flex-shrink: 0;
   touch-action: none;
 }
 
 .splitterVertical {
   width: 6px;
+  border-left: 1px solid var(--edith-border);
+  border-right: 1px solid var(--edith-border);
   cursor: col-resize;
 }
 
 .splitterHorizontal {
   height: 6px;
+  border-top: 1px solid var(--edith-border);
+  border-bottom: 1px solid var(--edith-border);
   cursor: row-resize;
 }
 
@@ -37,7 +41,7 @@
 
 .splitterVertical:hover,
 .splitterHorizontal:hover {
-  background: color-mix(in srgb, var(--edith-accent) 45%, var(--edith-border));
+  background: color-mix(in srgb, var(--edith-accent) 30%, var(--edith-bg-sunken));
 }
 
 .splitterVertical.isDragging,

@@ -6,6 +6,7 @@ import { useAskEdithStore } from '../store/askEdithStore';
 import { getMainFilePath, useEditorStore } from '../store/editorStore';
 import { type Rect, usePreviewStore } from '../store/previewStore';
 import { DeviceSwitcher } from './DeviceSwitcher';
+import { Icon } from './Icon';
 import { ProblemsIndicator } from './ProblemsIndicator';
 import { RelatedCssPanel } from './RelatedCssPanel';
 import { SelectionOverlay } from './SelectionOverlay';
@@ -46,6 +47,8 @@ export function PreviewPane() {
   const clearSelection = usePreviewStore((state) => state.clearSelection);
   const manualUpdateRequestId = usePreviewStore((state) => state.manualUpdateRequestId);
   const openAskEdith = useAskEdithStore((state) => state.openPanel);
+  const fullscreen = usePreviewStore((state) => state.fullscreen);
+  const setFullscreen = usePreviewStore((state) => state.setFullscreen);
 
   const rebuild = useCallback(
     (forceFull = false) => {
@@ -184,14 +187,31 @@ export function PreviewPane() {
   return (
     <div className={styles.pane}>
       <div className={styles.toolbar}>
-        <DeviceSwitcher device={device} onChange={setDevice} />
-        <ZoomControls zoom={zoom} onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={resetZoom} />
-        <ProblemsIndicator problems={problems} />
+        <div className={styles.toolbarGroup}>
+          <DeviceSwitcher device={device} onChange={setDevice} />
+          <ZoomControls zoom={zoom} onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={resetZoom} />
+        </div>
+        <div className={styles.toolbarGroup}>
+          <ProblemsIndicator problems={problems} />
+          {fullscreen && (
+            // Раньше из полноэкранного режима можно было выйти только по Esc.
+            <button
+              type="button"
+              className={`edith-btn ${styles.exitFullscreen}`}
+              title="Exit fullscreen (Esc)"
+              onClick={() => setFullscreen(false)}
+            >
+              <Icon name="minimize" />
+              Exit
+            </button>
+          )}
+        </div>
       </div>
 
       {missingResources.length > 0 && (
         <div className={styles.missingBanner}>
-          ⚠ {missingResources.length} resource{missingResources.length === 1 ? '' : 's'} not found
+          <Icon name="warning" size={11} /> {missingResources.length} resource
+          {missingResources.length === 1 ? '' : 's'} not found
           <ul>
             {missingResources.map((path) => (
               <li key={path}>{path}</li>
@@ -208,9 +228,10 @@ export function PreviewPane() {
       {selectedEntryId && (
         <button
           type="button"
-          className={styles.askEdithButton}
+          className={`edith-btn ${styles.askEdithButton}`}
           onClick={() => openAskEdith({ level: 'explain', contextMode: 'selection' })}
         >
+          <Icon name="sparkle" />
           Ask Edith about this element
         </button>
       )}

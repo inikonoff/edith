@@ -6,50 +6,64 @@
   background: var(--edith-bg-alt);
 }
 
+/* Высота совпадает с полосой вкладок кода — шапки панелей на одной линии. */
 .toolbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.35rem 0.6rem;
+  gap: 8px;
+  height: var(--edith-h-panehead);
+  padding: 0 12px 0 10px;
   border-bottom: 1px solid var(--edith-border);
-  background: var(--edith-bg);
+  background: var(--edith-bg-sunken);
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.exitFullscreen {
+  height: var(--edith-h-control-sm);
 }
 
 .missingBanner {
-  padding: 0.4rem 0.6rem;
-  font-size: 0.8rem;
-  background: #fff7e6;
-  color: #8a5a00;
+  padding: 5px 12px;
+  font-size: var(--edith-font-ui);
+  background: var(--edith-warning-bg);
+  color: var(--edith-warning-fg);
   border-bottom: 1px solid var(--edith-border);
 }
 
+.missingBanner svg {
+  vertical-align: -1px;
+}
+
 .missingBanner ul {
-  margin: 0.2rem 0 0;
-  padding-left: 1.1rem;
+  margin: 3px 0 0;
+  padding-left: 18px;
+  font-family: var(--edith-font-mono);
 }
 
 .askEdithButton {
   align-self: flex-start;
-  margin: 0.4rem 0.6rem 0;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--edith-border);
-  border-radius: 6px;
-  background: var(--edith-bg);
-  color: var(--edith-fg);
-  font-size: 0.8rem;
-  cursor: pointer;
+  margin: 8px 15px 0;
 }
 
 .frameScroll {
   flex: 1;
   overflow: auto;
-  padding: 1rem;
+  padding: 15px;
 }
 
 .zoomBox {
   flex-shrink: 0;
 }
 
+/* Белый фон кадра — намеренно: это «бумага» страницы, а не тема Edith. */
 .frameWrap {
   position: relative;
   background: #fff;

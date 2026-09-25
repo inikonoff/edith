@@ -26,9 +26,9 @@
 .error {
   padding: 0.5rem 0.75rem;
   margin-bottom: 1rem;
-  border: 1px solid #dc9a00;
-  background: #fff7e6;
-  color: #8a5a00;
+  border: 1px solid var(--edith-warning-border);
+  background: var(--edith-warning-bg);
+  color: var(--edith-warning-fg);
   border-radius: 4px;
   font-size: 0.85rem;
 }
@@ -44,7 +44,7 @@
 .dependencyPrompt ul {
   margin: 0.3rem 0;
   padding-left: 1.2rem;
-  font-family: monospace;
+  font-family: var(--edith-font-mono);
   font-size: 0.85rem;
 }
 
@@ -118,7 +118,8 @@
   gap: 0.4rem;
   padding: 0.5rem 1rem;
   font-size: 0.8rem;
-  background: #fff0f0;
+  background: var(--edith-danger-bg);
+  color: var(--edith-danger-fg);
 }
 
 .openCard {
