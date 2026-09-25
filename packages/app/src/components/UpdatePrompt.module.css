@@ -1,0 +1,55 @@
+.toast {
+  position: fixed;
+  right: 16px;
+  /* Над статус-баром редактора */
+  bottom: calc(var(--edith-h-statusbar) + 12px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: min(460px, calc(100vw - 32px));
+  padding: 10px 12px 10px 14px;
+  background: var(--edith-bg);
+  border: 1px solid var(--edith-border-strong);
+  border-left: 3px solid var(--edith-accent);
+  border-radius: 6px;
+  box-shadow: var(--edith-shadow-pop);
+  animation: edith-toast-in 160ms ease-out;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--edith-font-ui);
+  color: var(--edith-fg);
+}
+
+.hint {
+  font-size: var(--edith-font-ui-sm);
+  color: var(--edith-fg-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@keyframes edith-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
