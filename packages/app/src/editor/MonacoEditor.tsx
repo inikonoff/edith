@@ -1,5 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { useThemeStore } from '../store/themeStore';
+import { monacoThemeName } from './monacoThemes';
 
 interface CursorPosition {
   line: number;
@@ -64,13 +66,26 @@ export const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(fu
     const editor = monaco.editor.create(containerRef.current, {
       automaticLayout: true,
       minimap: { enabled: false },
-      fontSize: 13,
+      // Тема задаётся сразу при создании, иначе первый кадр рисуется в 'vs'.
+      theme: monacoThemeName(useThemeStore.getState().theme),
+      fontFamily: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
+      fontSize: 12,
+      lineHeight: 20,
+      padding: { top: 8 },
+      lineNumbersMinChars: 3,
+      renderLineHighlight: 'line',
+      // Скобки красятся палитрой темы, а не радужной подсветкой пар.
+      bracketPairColorization: { enabled: false },
+      scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
       // Source formatting is preserved as-is; Edith never reformats on its
       // own, only on an explicit user action (spec §16).
       formatOnPaste: false,
       formatOnType: false,
     });
     editorRef.current = editor;
+    // JetBrains Mono грузится асинхронно — после загрузки Monaco должен
+    // перемерить ширину символов, иначе курсор съезжает относительно текста.
+    document.fonts?.ready.then(() => monaco.editor.remeasureFonts());
     return () => {
       editor.dispose();
       editorRef.current = null;
