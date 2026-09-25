@@ -1,33 +1,150 @@
+/* ============================================================
+   Edith design tokens
+   Палитра и размеры — из макета (slate-шкала, компактные панели).
+   Всё, что красит интерфейс Edith, берётся отсюда; превью (iframe)
+   темой никогда не красится — spec §37.
+   ============================================================ */
+
 :root {
   color-scheme: light;
+
+  /* Высоты панелей */
+  --edith-h-menubar: 26px;
+  --edith-h-toolbar: 27px;
+  --edith-h-panehead: 22px;
+  --edith-h-statusbar: 21px;
+
+  /* Контролы */
+  --edith-h-control: 20px;
+  --edith-h-control-sm: 18px;
+  --edith-radius: 4px;
+  --edith-font-ui: 10.5px;
+  --edith-font-ui-sm: 10px;
+  --edith-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Поверхности */
   --edith-bg: #ffffff;
-  --edith-bg-alt: #f5f5f5;
-  --edith-fg: #1a1a1a;
-  --edith-fg-muted: #666666;
-  --edith-border: #dddddd;
-  --edith-accent: #2563eb;
+  --edith-bg-alt: #f8fafc; /* строка меню, статус-бар, гаттер, подложка превью */
+  --edith-bg-toolbar: #fafafc;
+  --edith-bg-sunken: #f1f5f9; /* шапки панелей, вкладки, сплиттер */
+  --edith-bg-hover: #f1f5f9;
+  --edith-bg-selected: #e2e8f0;
+
+  /* Текст */
+  --edith-fg: #1e293b;
+  --edith-fg-secondary: #334155;
+  --edith-fg-muted: #64748b;
+  --edith-fg-subtle: #94a3b8;
+
+  /* Линии */
+  --edith-border: #e2e8f0;
+  --edith-border-strong: #cbd5e1;
+
+  /* Акцент и статусы */
+  --edith-accent: #3b82f6;
+  --edith-accent-fg: #ffffff;
+  --edith-focus-ring: rgba(59, 130, 246, 0.45);
+  --edith-success: #10b981;
+  --edith-warning-bg: #fef3c7;
+  --edith-warning-border: #f59e0b;
+  --edith-warning-fg: #92400e;
+  --edith-danger-bg: #fee2e2;
+  --edith-danger-border: #f87171;
+  --edith-danger-fg: #991b1b;
+  --edith-diff-del-bg: #fdecea;
+  --edith-diff-del-fg: #7a1f1f;
+  --edith-diff-add-bg: #e6f6e9;
+  --edith-diff-add-fg: #1f5c2e;
+
+  /* Кнопки */
+  --edith-btn-bg: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  --edith-btn-bg-hover: linear-gradient(180deg, #ffffff 0%, #e8edf3 100%);
+  --edith-btn-bg-active: linear-gradient(180deg, #e8edf3 0%, #f1f5f9 100%);
+  --edith-btn-border: #cbd5e1;
+  --edith-btn-fg: #334155;
+  --edith-btn-primary-bg: linear-gradient(180deg, #f1f3f5 0%, #d9dce1 100%);
+  --edith-btn-primary-bg-hover: linear-gradient(180deg, #ffffff 0%, #e2e5e9 100%);
+  --edith-btn-primary-bg-active: linear-gradient(180deg, #d0d4da 0%, #e0e3e7 100%);
+  --edith-btn-primary-border: #b6bcc6;
+  --edith-btn-primary-border-hover: #9aa2b0;
+  --edith-btn-primary-fg: #000000;
+  --edith-btn-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --edith-shadow-btn: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --edith-shadow-pop: 0 6px 16px rgba(15, 23, 42, 0.12);
+  --edith-backdrop: rgba(15, 23, 42, 0.35);
 }
 
-/* Placeholder palette until Edith adopts LINK's actual brand tokens — kept
-   visually distinct from Light/Dark so the option is meaningfully different. */
+/* Тёплый вариант той же шкалы — пока у LINK нет своих бренд-токенов. */
 :root[data-theme='link'] {
   color-scheme: light;
-  --edith-bg: #faf8f5;
-  --edith-bg-alt: #f0ece4;
+  --edith-bg: #fdfcfa;
+  --edith-bg-alt: #f8f5f0;
+  --edith-bg-toolbar: #faf8f4;
+  --edith-bg-sunken: #f0ece4;
+  --edith-bg-hover: #f0ece4;
+  --edith-bg-selected: #e6dfd2;
   --edith-fg: #2b2620;
-  --edith-fg-muted: #8a8275;
-  --edith-border: #e0d9cc;
+  --edith-fg-secondary: #433c33;
+  --edith-fg-muted: #7a7266;
+  --edith-fg-subtle: #a69d8f;
+  --edith-border: #e6dfd2;
+  --edith-border-strong: #d4cab8;
   --edith-accent: #a855f7;
+  --edith-focus-ring: rgba(168, 85, 247, 0.4);
+  --edith-btn-bg: linear-gradient(180deg, #fffdfa 0%, #f3efe7 100%);
+  --edith-btn-bg-hover: linear-gradient(180deg, #fffdfa 0%, #ebe5da 100%);
+  --edith-btn-bg-active: linear-gradient(180deg, #ebe5da 0%, #f3efe7 100%);
+  --edith-btn-border: #d4cab8;
+  --edith-btn-fg: #433c33;
+  --edith-btn-primary-bg: linear-gradient(180deg, #f3f0ea 0%, #dcd6cb 100%);
+  --edith-btn-primary-bg-hover: linear-gradient(180deg, #fffdfa 0%, #e5dfd4 100%);
+  --edith-btn-primary-bg-active: linear-gradient(180deg, #d3ccbf 0%, #e3ddd2 100%);
+  --edith-btn-primary-border: #bdb3a2;
+  --edith-btn-primary-border-hover: #a3998a;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --edith-bg: #1a1a1a;
-  --edith-bg-alt: #242424;
-  --edith-fg: #e5e5e5;
-  --edith-fg-muted: #999999;
-  --edith-border: #3a3a3a;
+  --edith-bg: #0f172a;
+  --edith-bg-alt: #131c2e;
+  --edith-bg-toolbar: #111a2c;
+  --edith-bg-sunken: #1a2438;
+  --edith-bg-hover: #1e293b;
+  --edith-bg-selected: #334155;
+  --edith-fg: #e2e8f0;
+  --edith-fg-secondary: #cbd5e1;
+  --edith-fg-muted: #94a3b8;
+  --edith-fg-subtle: #64748b;
+  --edith-border: #243044;
+  --edith-border-strong: #334155;
   --edith-accent: #3b82f6;
+  --edith-focus-ring: rgba(96, 165, 250, 0.55);
+  --edith-success: #34d399;
+  --edith-warning-bg: #3b2a0c;
+  --edith-warning-border: #b45309;
+  --edith-warning-fg: #fcd34d;
+  --edith-danger-bg: #3f1518;
+  --edith-danger-border: #b91c1c;
+  --edith-danger-fg: #fca5a5;
+  --edith-diff-del-bg: #3f1518;
+  --edith-diff-del-fg: #fca5a5;
+  --edith-diff-add-bg: #0f2e1f;
+  --edith-diff-add-fg: #86efac;
+  --edith-btn-bg: linear-gradient(180deg, #243044 0%, #1c2638 100%);
+  --edith-btn-bg-hover: linear-gradient(180deg, #2b3a52 0%, #223047 100%);
+  --edith-btn-bg-active: linear-gradient(180deg, #1c2638 0%, #243044 100%);
+  --edith-btn-border: #334155;
+  --edith-btn-fg: #cbd5e1;
+  --edith-btn-primary-bg: linear-gradient(180deg, #4b5a70 0%, #364359 100%);
+  --edith-btn-primary-bg-hover: linear-gradient(180deg, #56667e 0%, #3e4c63 100%);
+  --edith-btn-primary-bg-active: linear-gradient(180deg, #334155 0%, #3e4c63 100%);
+  --edith-btn-primary-border: #5b6b82;
+  --edith-btn-primary-border-hover: #718199;
+  --edith-btn-primary-fg: #ffffff;
+  --edith-btn-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --edith-shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --edith-shadow-pop: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --edith-backdrop: rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -42,15 +159,157 @@ body,
 }
 
 body {
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
   color: var(--edith-fg);
   background: var(--edith-bg);
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
+  color: inherit;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--edith-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--edith-focus-ring);
+  outline-offset: 1px;
+}
+
+/* ============================================================
+   Кнопки
+   .edith-btn — стандартная, .edith-btn-primary — серая объёмная.
+   Кнопки без собственного класса получают стандартный вид, чтобы
+   нигде не оставалось нативных системных кнопок. :where() обнуляет
+   специфичность — стили модулей вида `.menu button` всегда сильнее.
+   ============================================================ */
+
+.edith-btn,
+.edith-btn-primary,
+:where(button:not([class])) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: var(--edith-h-control);
+  padding: 0 10px;
+  font-size: var(--edith-font-ui-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--edith-btn-fg);
+  background: var(--edith-btn-bg);
+  border: 0.8px solid var(--edith-btn-border);
+  border-radius: var(--edith-radius);
+  box-shadow: var(--edith-shadow-btn);
+  cursor: pointer;
+  user-select: none;
+}
+
+.edith-btn:hover,
+:where(button:not([class])):hover {
+  background: var(--edith-btn-bg-hover);
+}
+
+.edith-btn:active,
+:where(button:not([class])):active {
+  background: var(--edith-btn-bg-active);
+  box-shadow: none;
+}
+
+.edith-btn-primary {
+  padding: 0 12px;
+  font-size: var(--edith-font-ui);
+  font-weight: 600;
+  color: var(--edith-btn-primary-fg);
+  background: var(--edith-btn-primary-bg);
+  border: 1px solid var(--edith-btn-primary-border);
+  box-shadow: var(--edith-shadow-btn), var(--edith-btn-highlight);
+}
+
+.edith-btn-primary:hover {
+  background: var(--edith-btn-primary-bg-hover);
+  border-color: var(--edith-btn-primary-border-hover);
+}
+
+.edith-btn-primary:active {
+  background: var(--edith-btn-primary-bg-active);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.15);
+}
+
+.edith-btn:disabled,
+.edith-btn-primary:disabled,
+:where(button:not([class])):disabled {
+  opacity: 0.5;
+  cursor: default;
+  background: var(--edith-btn-bg);
+  box-shadow: none;
+}
+
+.edith-btn svg,
+.edith-btn-primary svg,
+:where(button:not([class])) svg {
+  flex-shrink: 0;
+}
+
+/* Сегментированная группа (устройства, масштаб) */
+.edith-segmented {
+  display: inline-flex;
+  height: var(--edith-h-control-sm);
+  background: var(--edith-btn-bg);
+  border: 0.8px solid var(--edith-btn-border);
+  border-radius: var(--edith-radius);
+  box-shadow: var(--edith-shadow-btn);
+  overflow: hidden;
+}
+
+.edith-segmented > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 100%;
+  padding: 0 8px;
+  font-size: var(--edith-font-ui-sm);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--edith-fg-muted);
+  background: transparent;
+  border: none;
+  border-left: 0.8px solid var(--edith-btn-border);
+  cursor: pointer;
+}
+
+.edith-segmented > button:first-child {
+  border-left: none;
+}
+
+.edith-segmented > button:hover {
+  background: var(--edith-bg-hover);
+  color: var(--edith-fg);
+}
+
+.edith-segmented > button[aria-pressed='true'] {
+  background: var(--edith-bg-selected);
+  color: var(--edith-fg);
+  font-weight: 600;
+}
+
+.edith-segmented > button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
+}
+
+/* Поля ввода вне модулей */
+input:not([type='checkbox']):not([type='radio']),
+textarea {
+  background: var(--edith-bg);
+  color: var(--edith-fg);
 }
