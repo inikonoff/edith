@@ -10,6 +10,8 @@ const EXTENSION_LANGUAGE: Record<string, string> = {
   tsx: 'typescript',
   json: 'json',
   svg: 'xml',
+  md: 'markdown',
+  txt: 'plaintext',
 };
 
 export function languageForPath(path: string): string {

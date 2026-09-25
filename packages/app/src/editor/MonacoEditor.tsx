@@ -10,6 +10,12 @@ interface CursorPosition {
 
 interface MonacoEditorProps {
   path: string;
+  /**
+   * Ключ модели Monaco. По умолчанию — path, но CodePane передаёт
+   * `${pageId}/${path}`: иначе у двух разных страниц с index.html была бы
+   * одна общая модель, и открытая вторая страница показывала бы текст первой.
+   */
+  modelKey?: string;
   language: string;
   value: string;
   onChange: (value: string) => void;
@@ -24,16 +30,52 @@ export interface MonacoEditorHandle {
 // each file's own undo stack, cursor, and scroll position (spec §8, §15).
 const models = new Map<string, monaco.editor.ITextModel>();
 
-function getOrCreateModel(path: string, language: string, value: string): monaco.editor.ITextModel {
-  const existing = models.get(path);
+function getOrCreateModel(key: string, language: string, value: string): monaco.editor.ITextModel {
+  const existing = models.get(key);
   if (existing) return existing;
-  const model = monaco.editor.createModel(value, language, monaco.Uri.parse(`file:///${path}`));
-  models.set(path, model);
+  const model = monaco.editor.createModel(value, language, monaco.Uri.parse(`file:///${key}`));
+  models.set(key, model);
   return model;
 }
 
+/**
+ * Переносит внешнее изменение (Ask Edith → Approve, вставка <link> при
+ * создании файла) в модель Monaco. Заменяется только отличающийся кусок
+ * между общим началом и общим концом — курсор и прокрутка не прыгают, а
+ * правка попадает в историю Undo как обычная.
+ */
+function syncModelValue(model: monaco.editor.ITextModel, value: string): void {
+  const current = model.getValue();
+  if (current === value) return;
+  let start = 0;
+  const maxStart = Math.min(current.length, value.length);
+  while (start < maxStart && current.charCodeAt(start) === value.charCodeAt(start)) start++;
+  let endCurrent = current.length;
+  let endValue = value.length;
+  while (
+    endCurrent > start &&
+    endValue > start &&
+    current.charCodeAt(endCurrent - 1) === value.charCodeAt(endValue - 1)
+  ) {
+    endCurrent--;
+    endValue--;
+  }
+  const from = model.getPositionAt(start);
+  const to = model.getPositionAt(endCurrent);
+  model.pushEditOperations(
+    [],
+    [
+      {
+        range: new monaco.Range(from.lineNumber, from.column, to.lineNumber, to.column),
+        text: value.slice(start, endValue),
+      },
+    ],
+    () => null,
+  );
+}
+
 export const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
-  { path, language, value, onChange, onCursorChange },
+  { path, modelKey, language, value, onChange, onCursorChange },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +137,7 @@ export const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(fu
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
-    const model = getOrCreateModel(path, language, value);
+    const model = getOrCreateModel(modelKey ?? path, language, value);
     if (editor.getModel() !== model) {
       editor.setModel(model);
     }
@@ -116,7 +158,15 @@ export const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(fu
     // `value` seeds a model only the first time it's created (see
     // getOrCreateModel) — re-running this on every keystroke would tear down
     // and rebuild the change subscription for no reason.
-  }, [path, language]);
+  }, [path, modelKey, language]);
+
+  // Внешние изменения содержимого. Раньше модель читала `value` только при
+  // создании, поэтому правки Ask Edith попадали в store, но не в редактор —
+  // и следующее нажатие клавиши затирало их старым текстом из модели.
+  useEffect(() => {
+    const model = editorRef.current?.getModel();
+    if (model) syncModelValue(model, value);
+  }, [value]);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 });
