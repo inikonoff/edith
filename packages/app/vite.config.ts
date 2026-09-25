@@ -20,7 +20,10 @@ export default defineConfig({
     // (spec §38-39) instead of fetching them from a CDN at runtime.
     monacoEditorPlugin({ languageWorkers: ['editorWorkerService', 'html', 'css', 'typescript'] }),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': новая версия не подменяет старую молча — пользователь видит
+      // плашку «Доступна новая версия» и сам решает, когда перезагрузить
+      // (важно для редактора с несохранёнными правками). См. UpdatePrompt.tsx.
+      registerType: 'prompt',
       manifest: {
         name: 'Edith',
         short_name: 'Edith',
