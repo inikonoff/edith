@@ -26,7 +26,7 @@ export function ThemeSwitcher() {
           </option>
         ))}
       </select>
-      <svg className={styles.chevron} width="8" height="6" viewBox="0 0 8 6" aria-hidden="true">
+      <svg className={styles.chevron} width="10" height="7" viewBox="0 0 8 6" aria-hidden="true">
         <path
           d="M1 1.5l3 3 3-3"
           fill="none"

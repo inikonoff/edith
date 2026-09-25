@@ -51,7 +51,7 @@ export function ExportMenu() {
       >
         <Icon name="download" />
         Export
-        <Icon name="chevronDown" size={10} />
+        <Icon name="chevronDown" size={12} />
       </button>
       {open && (
         <div className={styles.menu} role="menu">

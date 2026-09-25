@@ -13,6 +13,7 @@ export function CodePane() {
   const pendingReveal = useEditorStore((state) => state.pendingReveal);
   const clearPendingReveal = useEditorStore((state) => state.clearPendingReveal);
   const setCursor = useEditorStore((state) => state.setCursor);
+  const pageId = useEditorStore((state) => state.pageId);
   const editorRef = useRef<MonacoEditorHandle>(null);
 
   const current = files.find((file) => file.path === activeFile);
@@ -37,6 +38,7 @@ export function CodePane() {
           <MonacoEditor
             ref={editorRef}
             path={current.path}
+            modelKey={`${pageId ?? 'page'}/${current.path}`}
             language={languageForPath(current.path)}
             value={current.content}
             onChange={(value) => updateFileContent(current.path, value)}

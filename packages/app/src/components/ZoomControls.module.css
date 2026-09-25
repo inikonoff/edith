@@ -1,7 +1,7 @@
 /* Внутри .edith-segmented: фиксированная ширина, чтобы группа не прыгала
    при переходе 75% → 100% → 125%. */
 .label {
-  width: 46px;
+  width: 56px;
   color: var(--edith-fg-secondary) !important;
   font-variant-numeric: tabular-nums;
 }

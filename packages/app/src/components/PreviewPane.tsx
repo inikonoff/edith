@@ -210,7 +210,7 @@ export function PreviewPane() {
 
       {missingResources.length > 0 && (
         <div className={styles.missingBanner}>
-          <Icon name="warning" size={11} /> {missingResources.length} resource
+          <Icon name="warning" size={13} /> {missingResources.length} resource
           {missingResources.length === 1 ? '' : 's'} not found
           <ul>
             {missingResources.map((path) => (

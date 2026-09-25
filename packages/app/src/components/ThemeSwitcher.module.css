@@ -2,9 +2,9 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: 19px;
-  min-width: 122px;
-  padding: 0 22px 0 10px;
+  height: 24px;
+  min-width: 152px;
+  padding: 0 26px 0 12px;
   background: var(--edith-btn-bg);
   border: 0.8px solid var(--edith-btn-border);
   border-radius: var(--edith-radius);
@@ -30,7 +30,7 @@
   position: absolute;
   inset: 0;
   width: 100%;
-  padding: 0 22px 0 52px;
+  padding: 0 26px 0 64px;
   border: none;
   background: transparent;
   color: inherit;
@@ -52,7 +52,7 @@
 
 .chevron {
   position: absolute;
-  right: 9px;
+  right: 11px;
   top: 50%;
   margin-top: -3px;
   color: var(--edith-fg-muted);

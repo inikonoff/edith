@@ -19,7 +19,7 @@ export function ZoomControls({ zoom, onZoomIn, onZoomOut, onReset }: ZoomControl
         title="Zoom out"
         aria-label="Zoom out"
       >
-        <Icon name="minus" size={11} />
+        <Icon name="minus" size={14} />
       </button>
       <button type="button" className={styles.label} onClick={onReset} title="Reset zoom to 100%">
         {Math.round(zoom * 100)}%
@@ -31,7 +31,7 @@ export function ZoomControls({ zoom, onZoomIn, onZoomOut, onReset }: ZoomControl
         title="Zoom in"
         aria-label="Zoom in"
       >
-        <Icon name="plus" size={11} />
+        <Icon name="plus" size={14} />
       </button>
     </div>
   );

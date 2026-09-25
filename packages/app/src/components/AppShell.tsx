@@ -184,15 +184,6 @@ export function AppShell() {
         <div className={styles.toolbarGroup}>
           <button
             type="button"
-            className="edith-btn-primary"
-            title="Update preview (Ctrl/Cmd+Enter)"
-            onClick={requestManualUpdate}
-          >
-            <Icon name="play" size={11} />
-            Run
-          </button>
-          <button
-            type="button"
             className="edith-btn"
             title="Save (Ctrl/Cmd+S)"
             disabled={!dirty || saving}
@@ -270,7 +261,10 @@ export function AppShell() {
           {cursorLabel && <span className={styles.statusMuted}>{cursorLabel}</span>}
           <span className={styles.statusMuted}>UTF-8</span>
         </div>
-        <label className={styles.statusItem} title="Rebuild the preview while you type">
+        <label
+          className={styles.statusItem}
+          title="Rebuild the preview while you type. When off, press Ctrl/Cmd+Enter to update."
+        >
           <input
             type="checkbox"
             checked={autoUpdate}

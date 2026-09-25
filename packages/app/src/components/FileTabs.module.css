@@ -1,12 +1,19 @@
-.tabs {
+.bar {
   flex-shrink: 0;
   display: flex;
   align-items: flex-end;
-  gap: 2px;
   height: var(--edith-h-panehead);
-  padding: 0 12px;
+  padding: 0 8px 0 12px;
   background: var(--edith-bg-sunken);
   border-bottom: 1px solid var(--edith-border);
+}
+
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -14,14 +21,15 @@
 
 .tab {
   position: relative;
-  height: 20px;
-  padding: 0 10px;
+  flex-shrink: 0;
+  height: calc(var(--edith-h-panehead) - 3px);
+  padding: 0 12px;
   border: none;
   border-radius: 2px 2px 0 0;
   background: transparent;
   color: var(--edith-fg-muted);
   font-size: var(--edith-font-ui);
-  line-height: 20px;
+  line-height: calc(var(--edith-h-panehead) - 3px);
   white-space: nowrap;
   cursor: pointer;
 }
@@ -36,6 +44,6 @@
   font-weight: 600;
   /* Сдвиг на 1px вниз перекрывает нижнюю границу полосы — вкладка «сливается» с редактором. */
   margin-bottom: -1px;
-  height: 21px;
-  box-shadow: inset 0 1.8px 0 var(--edith-accent);
+  height: calc(var(--edith-h-panehead) - 2px);
+  box-shadow: inset 0 2px 0 var(--edith-accent);
 }

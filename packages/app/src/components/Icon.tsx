@@ -2,7 +2,6 @@
 // которые в разных ОС рендерятся по-разному. Рисуются currentColor.
 
 export type IconName =
-  | 'play'
   | 'save'
   | 'columns'
   | 'rows'
@@ -18,7 +17,6 @@ export type IconName =
   | 'warning';
 
 const PATHS: Record<IconName, JSX.Element> = {
-  play: <polygon points="4,2.5 4,11.5 11,7" fill="currentColor" stroke="none" />,
   save: (
     <>
       <path d="M2.5 2.5h7l2 2v7h-9z" />
@@ -65,7 +63,7 @@ interface IconProps {
   size?: number;
 }
 
-export function Icon({ name, size = 12 }: IconProps) {
+export function Icon({ name, size = 15 }: IconProps) {
   return (
     <svg
       width={size}
