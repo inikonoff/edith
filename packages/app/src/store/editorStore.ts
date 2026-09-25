@@ -71,12 +71,18 @@ interface EditorStore {
   showLauncher: () => void;
   setActiveFile: (path: string) => void;
   updateFileContent: (path: string, content: string) => void;
+  /** Adds a new text file to the open page and switches to it; autosave persists it. */
+  addFile: (file: EditorFile) => void;
   setAutoUpdate: (value: boolean) => void;
   setSplitPosition: (value: number) => void;
   setSplitAxis: (axis: SplitAxis) => void;
   swapPanes: () => void;
   setSplitSwapped: (value: boolean) => void;
-  restoreSplitFromSession: (session: { splitPosition?: number; splitAxis?: SplitAxis; splitSwapped?: boolean }) => void;
+  restoreSplitFromSession: (session: {
+    splitPosition?: number;
+    splitAxis?: SplitAxis;
+    splitSwapped?: boolean;
+  }) => void;
   setSaveStatus: (status: EditorStore['saveStatus']) => void;
   markSaved: () => void;
   revealPosition: (target: RevealTarget) => void;
@@ -132,6 +138,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       files: state.files.map((file) => (file.path === path ? { ...file, content } : file)),
       dirty: true,
     })),
+
+  addFile: (file) => {
+    if (get().files.some((existing) => existing.path === file.path)) return;
+    set((state) => ({ files: [...state.files, file], dirty: true }));
+    get().setActiveFile(file.path);
+  },
 
   setAutoUpdate: (value) => set({ autoUpdate: value }),
 
