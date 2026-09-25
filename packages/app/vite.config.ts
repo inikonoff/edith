@@ -41,6 +41,9 @@ export default defineConfig({
         // files would silently fall outside the precache and offline launch
         // (spec §38-39) would break for exactly the parts that matter most.
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
+        // Шрифт JetBrains Mono лежит в бандле — кладём его в precache, чтобы
+        // редактор офлайн не откатывался на системный моноширинный.
+        globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
       },
     }),
   ],
