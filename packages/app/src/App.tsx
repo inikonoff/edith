@@ -2,6 +2,7 @@ import { getPageState, listPages } from '@edith/core';
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
 import { LauncherScreen } from './components/LauncherScreen';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { applyMonacoTheme } from './editor/monacoThemes';
 import { loadPageForEditor } from './page/pageService';
 import { useEditorStore } from './store/editorStore';
@@ -62,6 +63,10 @@ export function App() {
     // Runs once on mount to restore the last session.
   }, []);
 
-  if (booting) return null;
-  return view === 'editor' ? <AppShell /> : <LauncherScreen />;
+  return (
+    <>
+      {!booting && (view === 'editor' ? <AppShell /> : <LauncherScreen />)}
+      <UpdatePrompt />
+    </>
+  );
 }
