@@ -109,11 +109,29 @@ const server = createServer((req, res) => {
   }
 });
 
-server.listen(0, '127.0.0.1', () => {
+// A fixed port (rather than letting the OS assign a random one) means
+// relaunching Edith reuses the same http://localhost:PORT/ origin — and
+// therefore the same IndexedDB storage (My Pages, autosave) and the same
+// service worker cache — instead of starting over empty on every launch.
+// Falls back to an OS-assigned port only if that one's genuinely taken
+// (e.g. by another running copy of Edith).
+const PREFERRED_PORT = 47890;
+
+function onListening() {
   const address = server.address();
-  const port = typeof address === 'object' && address ? address.port : 0;
+  const port = typeof address === 'object' && address ? address.port : PREFERRED_PORT;
   const url = `http://localhost:${port}/`;
   console.log(`Edith is running at ${url}`);
   console.log('Keep this window open while you use Edith. Press Ctrl+C to stop.\n');
   openBrowser(url);
+}
+
+server.once('error', (error) => {
+  if (error.code !== 'EADDRINUSE') throw error;
+  console.log(
+    `Port ${PREFERRED_PORT} is busy (maybe Edith is already running?) — picking another one.`,
+  );
+  server.listen(0, '127.0.0.1');
 });
+server.once('listening', onListening);
+server.listen(PREFERRED_PORT, '127.0.0.1');

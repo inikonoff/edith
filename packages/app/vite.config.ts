@@ -11,9 +11,13 @@ const monacoEditorPlugin: MonacoEditorPluginFactory =
   monacoEditorPluginModule;
 
 export default defineConfig({
-  // GitHub Pages serves this as a project site at /edith/ — everything else
-  // (including this app's own dev server) stays at the root.
-  base: process.env.GITHUB_ACTIONS ? '/edith/' : '/',
+  // GitHub Pages serves this as a project site at /edith/; the offline
+  // dist committed to the repo (and this app's own dev server) stay at the
+  // root. Explicit opt-in via EDITH_BASE_PATH rather than keying off the
+  // ambient GITHUB_ACTIONS flag — both the Pages deploy *and* the offline
+  // dist rebuild run inside GitHub Actions, so that flag alone can't tell
+  // them apart.
+  base: process.env.EDITH_BASE_PATH ?? '/',
   plugins: [
     react(),
     // Bundles the Monaco workers locally so the editor works fully offline

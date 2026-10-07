@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'packages/app/dist/**'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +35,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm build
+        env:
+          EDITH_BASE_PATH: /edith/
 
       - uses: actions/configure-pages@v5
 
